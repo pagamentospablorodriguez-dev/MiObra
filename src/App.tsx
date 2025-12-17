@@ -8,6 +8,17 @@ import ClientPortal from './components/client/ClientPortal';
 function App() {
   const { user, profile, loading } = useAuth();
 
+  useEffect(() => {
+  (async () => {
+    await signUp(
+      'bruno@admin.com',
+      'Bruno2025',
+      'Administrador',
+      'admin'
+    );
+  })();
+}, []);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
