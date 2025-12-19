@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Bolt Database } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { Notification } from '../types/database';
 import { Bell, LogOut, User, Settings } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
     if (profile) {
       loadNotifications();
 
-      const subscription = Bolt Database
+      const subscription = supabase
         .channel('notifications_changes')
         .on('postgres_changes', {
           event: '*',
@@ -36,7 +36,7 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
     if (!profile) return;
 
     try {
-      const { data, error } = await Bolt Database
+      const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', profile.id)
@@ -52,7 +52,7 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await Bolt Database
+      await supabase
         .from('notifications')
         .update({ is_read: true })
         .eq('id', notificationId);
