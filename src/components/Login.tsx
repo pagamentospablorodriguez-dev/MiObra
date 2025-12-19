@@ -16,8 +16,9 @@ export default function Login() {
 
     try {
       await signIn(email, password);
-    } catch (err) {
-      setError('Email ou senha incorretos');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Email ou senha incorretos');
     } finally {
       setLoading(false);
     }
@@ -34,10 +35,10 @@ export default function Login() {
           </div>
 
           <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
-            Sistema de Gestão
+            AlaObra
           </h1>
           <p className="text-center text-gray-600 mb-8">
-            Controle total das suas obras
+            Gestão completa de obras
           </p>
 
           {error && (
