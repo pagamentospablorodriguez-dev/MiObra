@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { User } from '@supabase/Bolt Database-js';
+import { Bolt Database } from '../lib/supabase';
 import { Profile } from '../types/database';
 
 interface AuthContextType {
@@ -44,44 +44,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     try {
-      let { data, error } = await supabase
+      let { data, error } = await Bolt Database
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) {
+        console.error('Error loading profile:', error);
+      }
 
       if (!data) {
-        const { data: newProfile, error: insertError } = await supabase
+        console.log('Profile not found, creating...');
+        const { data: newProfile, error: insertError } = await Bolt Database
           .from('profiles')
           .insert({
             id: userId,
-            full_name: 'Usuário',
+            full_name: 'Administrador',
             role: 'admin',
+            is_active: true
           })
           .select()
           .single();
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+        }
         data = newProfile;
       }
 
+      console.log('Profile loaded:', data);
       setProfile(data);
     } catch (error) {
-      console.error('Error loading profile:', error);
-      setProfile(null);
+      console.error('Fatal error loading profile:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    console.log('Attempting sign in...');
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (error) throw error;
+    
+    if (error) {
+      console.error('Sign in error:', error);
+      throw error;
+    }
+    
+    console.log('Sign in success:', data);
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: string) => {
@@ -89,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
     });
+    
     if (error) throw error;
 
     if (data.user) {
@@ -96,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data.user.id,
         full_name: fullName,
         role: role,
+        is_active: true
       });
     }
   };
