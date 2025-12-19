@@ -28,8 +28,8 @@ export default function Login() {
   const handleEmergencyLogin = async () => {
     setLoading(true);
     try {
-      const adminEmail = 'admin@alaobra.com';
-      const adminPassword = 'admin123456';
+      const adminEmail = 'bruno@alaobra.com';
+      const adminPassword = 'Bruno2025@';
 
       let { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: adminEmail,
