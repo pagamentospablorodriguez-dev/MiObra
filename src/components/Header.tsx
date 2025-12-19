@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { Bolt Database } from '../lib/supabase';
 import { Notification } from '../types/database';
-import { Bell, LogOut, User } from 'lucide-react';
+import { Bell, LogOut, User, Settings } from 'lucide-react';
 
-export default function Header() {
+export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) {
   const { profile, signOut } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -14,7 +14,7 @@ export default function Header() {
     if (profile) {
       loadNotifications();
 
-      const subscription = supabase
+      const subscription = Bolt Database
         .channel('notifications_changes')
         .on('postgres_changes', {
           event: '*',
@@ -36,7 +36,7 @@ export default function Header() {
     if (!profile) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await Bolt Database
         .from('notifications')
         .select('*')
         .eq('user_id', profile.id)
@@ -52,7 +52,7 @@ export default function Header() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await supabase
+      await Bolt Database
         .from('notifications')
         .update({ is_read: true })
         .eq('id', notificationId);
@@ -76,7 +76,7 @@ export default function Header() {
               </svg>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">Sistema de Gestão</h1>
+              <h1 className="text-lg font-bold text-gray-900">AlaObra</h1>
               <p className="text-xs text-gray-500">
                 {profile?.role === 'admin' && 'Administrador'}
                 {profile?.role === 'worker' && 'Funcionário'}
@@ -86,6 +86,15 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4">
+            {profile?.role === 'admin' && onAdminPanel && (
+              <button
+                onClick={onAdminPanel}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+            )}
+
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -131,13 +140,6 @@ export default function Header() {
                                 <p className="text-sm text-gray-600 mt-1">
                                   {notification.message}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {new Date(notification.created_at).toLocaleDateString('pt-BR')} às{' '}
-                                  {new Date(notification.created_at).toLocaleTimeString('pt-BR', {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                  })}
-                                </p>
                               </div>
                             </div>
                           </div>
@@ -168,13 +170,6 @@ export default function Header() {
                         {profile?.role === 'worker' && 'Funcionário'}
                         {profile?.role === 'client' && 'Cliente'}
                       </p>
-                      {profile?.role === 'worker' && profile?.rating > 0 && (
-                        <div className="mt-2 flex items-center gap-1 text-sm">
-                          <span className="text-yellow-500">⭐</span>
-                          <span className="font-medium">{profile.rating.toFixed(1)}</span>
-                          <span className="text-gray-500">({profile.total_ratings} avaliações)</span>
-                        </div>
-                      )}
                     </div>
                     <button
                       onClick={signOut}
