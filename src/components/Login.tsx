@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Bolt Database } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { Building2 } from 'lucide-react';
 
 export default function Login() {
@@ -46,7 +46,7 @@ export default function Login() {
       if (userId) {
         console.log('User created, ID:', userId);
         
-        const { error: profileError } = await Bolt Database
+        const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
             id: userId,
