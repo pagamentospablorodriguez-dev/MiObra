@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bolt Database } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Profile } from '../../types/database';
 import { Trash2, Edit2 } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export default function UserManagement() {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await Bolt Database
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
