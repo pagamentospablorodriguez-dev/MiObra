@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from '@supabase/Bolt Database-js';
-import { Bolt Database } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
 
 interface AuthContextType {
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     try {
-      let { data, error } = await Bolt Database
+      let { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!data) {
         console.log('Profile not found, creating...');
-        const { data: newProfile, error: insertError } = await Bolt Database
+        const { data: newProfile, error: insertError } = await supabase
           .from('profiles')
           .insert({
             id: userId,
