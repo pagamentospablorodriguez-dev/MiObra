@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bolt Database } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Plus } from 'lucide-react';
 import UserManagement from './UserManagement';
 import ProjectManagement from './ProjectManagement';
