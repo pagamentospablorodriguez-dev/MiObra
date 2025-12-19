@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { Building2 } from 'lucide-react';
 
 export default function Login() {
@@ -19,6 +20,42 @@ export default function Login() {
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Email ou senha incorretos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmergencyLogin = async () => {
+    setLoading(true);
+    try {
+      const adminEmail = 'admin@alaobra.com';
+      const adminPassword = 'admin123456';
+
+      let { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: adminEmail,
+        password: adminPassword,
+        options: {
+          data: {
+            full_name: 'Administrador',
+            role: 'admin'
+          }
+        }
+      });
+
+      if (signUpError && !signUpError.message.includes('already')) {
+        throw signUpError;
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: adminEmail,
+        password: adminPassword,
+      });
+
+      if (signInError) throw signInError;
+
+    } catch (err: any) {
+      console.error('Emergency login error:', err);
+      setError('Erro no login de emergência');
     } finally {
       setLoading(false);
     }
@@ -47,7 +84,7 @@ export default function Login() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 mb-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
@@ -86,6 +123,19 @@ export default function Login() {
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
+
+          <div className="border-t border-gray-200 pt-4">
+            <button
+              onClick={handleEmergencyLogin}
+              disabled={loading}
+              className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50"
+            >
+              🚨 Login de Emergência (Criar Admin)
+            </button>
+            <p className="text-xs text-center text-gray-500 mt-2">
+              Clique aqui para criar e entrar como admin@alaobra.com
+            </p>
+          </div>
         </div>
       </div>
     </div>
