@@ -44,57 +44,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     try {
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error loading profile:', error);
-      }
-
-      if (!data) {
-        console.log('Profile not found, creating...');
-        const { data: newProfile, error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: userId,
-            full_name: 'Administrador',
-            role: 'admin',
-            is_active: true
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-        }
-        data = newProfile;
-      }
-
-      console.log('Profile loaded:', data);
+      if (error) throw error;
       setProfile(data);
     } catch (error) {
-      console.error('Fatal error loading profile:', error);
+      console.error('Error loading profile:', error);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    console.log('Attempting sign in...');
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    
-    if (error) {
-      console.error('Sign in error:', error);
-      throw error;
-    }
-    
-    console.log('Sign in success:', data);
+    if (error) throw error;
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: string) => {
@@ -102,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
     });
-    
     if (error) throw error;
 
     if (data.user) {
@@ -110,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data.user.id,
         full_name: fullName,
         role: role,
-        is_active: true
       });
     }
   };
