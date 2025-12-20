@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 import { Building2 } from 'lucide-react';
 
 export default function Login() {
@@ -16,56 +15,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-      console.log('Trying to login with:', email);
       await signIn(email, password);
-      console.log('Login successful!');
     } catch (err: any) {
-      console.error('Login failed:', err);
       setError(err.message || 'Erro ao fazer login');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createAdminNow = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      console.log('Creating admin user...');
-      
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: 'admin@alaobra.com',
-        password: 'admin123',
-      });
-
-      if (signUpError && !signUpError.message.includes('already')) {
-        throw signUpError;
-      }
-
-      const userId = signUpData.user?.id;
-      if (userId) {
-        console.log('User created, ID:', userId);
-        
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: userId,
-            full_name: 'Administrador',
-            role: 'admin',
-            is_active: true
-          });
-
-        if (profileError) {
-          console.error('Profile error:', profileError);
-        }
-      }
-
-      console.log('Now trying to sign in...');
-      await signIn('admin@alaobra.com', 'admin123');
-      
-    } catch (err: any) {
-      console.error('Create admin error:', err);
-      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -94,13 +46,13 @@ export default function Login() {
             </div>
           )}
 
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-blue-700 text-sm font-medium mb-2">Login padrão:</p>
-            <p className="text-blue-600 text-xs">Email: admin@alaobra.com</p>
-            <p className="text-blue-600 text-xs">Senha: admin123</p>
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700 text-sm font-medium mb-2">Credenciais padrão:</p>
+            <p className="text-green-600 text-xs">Email: admin@alaobra.com</p>
+            <p className="text-green-600 text-xs">Senha: admin123</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 mb-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
@@ -110,7 +62,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 required
               />
             </div>
@@ -124,7 +76,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 required
               />
             </div>
@@ -132,19 +84,11 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
-
-          <button
-            onClick={createAdminNow}
-            disabled={loading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition"
-          >
-            Criar Admin e Entrar
-          </button>
         </div>
       </div>
     </div>
