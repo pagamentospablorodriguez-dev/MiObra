@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Project } from '../../types/database';
+import { Bolt Database } from '../../lib/supabase';
+import { Project, Profile } from '../../types/database';
 import { Trash2 } from 'lucide-react';
 
 export default function ProjectManagement() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [clients, setClients] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -12,15 +13,32 @@ export default function ProjectManagement() {
     address: '',
     budget: '',
     description: '',
+    client_id: '',
   });
 
   useEffect(() => {
     loadProjects();
+    loadClients();
   }, []);
+
+  const loadClients = async () => {
+    try {
+      const { data, error } = await Bolt Database
+        .from('profiles')
+        .select('*')
+        .eq('role', 'client')
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setClients(data || []);
+    } catch (error) {
+      console.error('Error loading clients:', error);
+    }
+  };
 
   const loadProjects = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await Bolt Database
         .from('projects')
         .select('*')
         .order('created_at', { ascending: false });
@@ -41,19 +59,22 @@ export default function ProjectManagement() {
         name: formData.name,
         address: formData.address,
         budget: parseFloat(formData.budget),
-        description: formData.description,
+        spent: 0,
+        description: formData.description || null,
         status: 'in_progress',
         progress_percentage: 0,
+        client_id: formData.client_id || null,
       });
 
       if (error) throw error;
 
-      setFormData({ name: '', address: '', budget: '', description: '' });
+      setFormData({ name: '', address: '', budget: '', description: '', client_id: '' });
       setShowForm(false);
       loadProjects();
-    } catch (error) {
+      alert('Obra criada com sucesso!');
+    } catch (error: any) {
       console.error('Error creating project:', error);
-      alert('Erro ao criar obra');
+      alert('Erro ao criar obra: ' + error.message);
     }
   };
 
@@ -61,7 +82,8 @@ export default function ProjectManagement() {
     if (!confirm('Tem certeza que deseja deletar esta obra?')) return;
 
     try {
-      await supabase.from('projects').delete().eq('id', projectId);
+      const { error } = await supabase.from('projects').delete().eq('id', projectId);
+      if (error) throw error;
       loadProjects();
     } catch (error) {
       console.error('Error deleting project:', error);
@@ -109,12 +131,29 @@ export default function ProjectManagement() {
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cliente (opcional)</label>
+              <select
+                value={formData.client_id}
+                onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="">Sem cliente</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Orçamento (€)</label>
               <input
                 type="number"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                min="0"
+                step="0.01"
                 required
               />
             </div>
