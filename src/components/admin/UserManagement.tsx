@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bolt Database } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Profile, UserRole } from '../../types/database';
 import { Trash2 } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export default function UserManagement() {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await Bolt Database
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
@@ -40,6 +40,12 @@ export default function UserManagement() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          data: {
+            full_name: formData.full_name,
+            role: formData.role,
+          }
+        }
       });
 
       if (authError) throw authError;
@@ -56,7 +62,10 @@ export default function UserManagement() {
         setFormData({ email: '', password: '', full_name: '', role: 'worker' });
         setShowForm(false);
         
-        await loadUsers();
+        setTimeout(() => {
+          loadUsers();
+        }, 1000);
+
         alert('Usuário criado com sucesso!');
       }
     } catch (error: any) {
@@ -71,7 +80,7 @@ export default function UserManagement() {
     try {
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
-      await loadUsers();
+      loadUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('Erro ao deletar usuário');
