@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Profile } from '../../types/database';
-import { Trash2, Edit2 } from 'lucide-react';
+import { Bolt Database } from '../../lib/supabase';
+import { Profile, UserRole } from '../../types/database';
+import { Trash2 } from 'lucide-react';
 
 export default function UserManagement() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -11,7 +11,7 @@ export default function UserManagement() {
     email: '',
     password: '',
     full_name: '',
-    role: 'worker' as const,
+    role: 'worker' as UserRole,
   });
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function UserManagement() {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await Bolt Database
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
@@ -40,24 +40,37 @@ export default function UserManagement() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          data: {
+            full_name: formData.full_name,
+            role: formData.role,
+          }
+        }
       });
 
       if (authError) throw authError;
 
       if (authData.user) {
-        await supabase.from('profiles').insert({
+        const { error: profileError } = await supabase.from('profiles').insert({
           id: authData.user.id,
           full_name: formData.full_name,
           role: formData.role,
         });
 
+        if (profileError) throw profileError;
+
         setFormData({ email: '', password: '', full_name: '', role: 'worker' });
         setShowForm(false);
-        loadUsers();
+        
+        setTimeout(() => {
+          loadUsers();
+        }, 1000);
+
+        alert('Usuário criado com sucesso!');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user:', error);
-      alert('Erro ao criar usuário');
+      alert('Erro ao criar usuário: ' + error.message);
     }
   };
 
@@ -65,7 +78,8 @@ export default function UserManagement() {
     if (!confirm('Tem certeza que deseja deletar este usuário?')) return;
 
     try {
-      await supabase.from('profiles').delete().eq('id', userId);
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      if (error) throw error;
       loadUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -109,6 +123,7 @@ export default function UserManagement() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                minLength={6}
                 required
               />
             </div>
@@ -126,7 +141,7 @@ export default function UserManagement() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
               <select
                 value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="admin">Admin</option>
@@ -159,21 +174,25 @@ export default function UserManagement() {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nome</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tipo</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ações</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-3">{user.full_name}</td>
-                  <td className="px-6 py-3 text-sm text-gray-600">{user.id}</td>
+                  <td className="px-6 py-3 font-medium">{user.full_name}</td>
                   <td className="px-6 py-3">
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
                       {user.role === 'admin' && 'Admin'}
                       {user.role === 'worker' && 'Funcionário'}
                       {user.role === 'client' && 'Cliente'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3">
+                    <span className={`px-2 py-1 rounded text-sm ${user.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      {user.is_active ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
                   <td className="px-6 py-3">
