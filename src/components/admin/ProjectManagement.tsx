@@ -70,7 +70,7 @@ export default function ProjectManagement() {
 
       setFormData({ name: '', address: '', budget: '', description: '', client_id: '' });
       setShowForm(false);
-      loadProjects();
+      await loadProjects();
       alert('Obra criada com sucesso!');
     } catch (error: any) {
       console.error('Error creating project:', error);
@@ -84,7 +84,7 @@ export default function ProjectManagement() {
     try {
       const { error } = await supabase.from('projects').delete().eq('id', projectId);
       if (error) throw error;
-      loadProjects();
+      await loadProjects();
     } catch (error) {
       console.error('Error deleting project:', error);
       alert('Erro ao deletar obra');
