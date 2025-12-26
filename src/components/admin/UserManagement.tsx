@@ -40,12 +40,6 @@ export default function UserManagement() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            full_name: formData.full_name,
-            role: formData.role,
-          }
-        }
       });
 
       if (authError) throw authError;
@@ -62,10 +56,7 @@ export default function UserManagement() {
         setFormData({ email: '', password: '', full_name: '', role: 'worker' });
         setShowForm(false);
         
-        setTimeout(() => {
-          loadUsers();
-        }, 1000);
-
+        await loadUsers();
         alert('Usuário criado com sucesso!');
       }
     } catch (error: any) {
@@ -80,7 +71,7 @@ export default function UserManagement() {
     try {
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
-      loadUsers();
+      await loadUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('Erro ao deletar usuário');
