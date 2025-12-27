@@ -202,7 +202,11 @@ export default function ProjectManagement() {
                 <tr key={project.id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="px-6 py-3 font-medium">{project.name}</td>
                   <td className="px-6 py-3 text-sm text-gray-600">{project.address}</td>
-                  <td className="px-6 py-3">€{project.budget.toLocaleString()}</td>
+                  
+                  <td className="px-6 py-3">
+  €{Number(project.budget || 0).toLocaleString()}
+</td>
+                  
                   <td className="px-6 py-3">{project.progress_percentage}%</td>
                   <td className="px-6 py-3">
                     <button
