@@ -34,37 +34,51 @@ export default function UserManagement() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
 
-      if (authError) throw authError;
 
-      if (authData.user) {
-        const { error: profileError } = await supabase.from('profiles').insert({
-          id: authData.user.id,
+
+  
+const handleCreate = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    // 1. CRIAR APENAS NO AUTH (O banco faz o resto sozinho via Trigger)
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
           full_name: formData.full_name,
           role: formData.role,
-        });
-
-        if (profileError) throw profileError;
-
-        setFormData({ email: '', password: '', full_name: '', role: 'worker' });
-        setShowForm(false);
-        
-        await loadUsers();
-        alert('Usuário criado com sucesso!');
+        }
       }
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      alert('Erro ao criar usuário: ' + error.message);
-    }
-  };
+    });
 
+    if (signUpError) throw signUpError;
+
+    // IMPORTANTE: REMOVA qualquer linha que faça: 
+    // await supabase.from('profiles').insert(...)
+    // Isso é o que causa o erro 409 (Conflict) e o nome "Usuário"
+
+    alert('Usuário criado com sucesso!');
+    setShowForm(false);
+    setFormData({ email: '', password: '', full_name: '', role: 'worker' });
+    loadUsers();
+  } catch (error: any) {
+    console.error('Error creating user:', error);
+    alert('Erro ao criar usuário: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+
+
+  
   const handleDelete = async (userId: string) => {
     if (!confirm('Tem certeza que deseja deletar este usuário?')) return;
 
