@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from '@supabase/Bolt Database-js';
+import { User } from '@supabase/supabase';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
 
