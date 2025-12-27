@@ -277,7 +277,11 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Orçamento Total</span>
-                  <span className="font-medium">€{project.budget.toLocaleString()}</span>
+
+                  
+                  <span className="font-medium">€{Number(project.budget || 0).toLocaleString()}</span>
+                
+                
                 </div>
               </div>
             </div>
