@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from '@supabase/supabase';
-import { Bolt Database } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
 
 interface AuthContextType {
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     try {
-      const { data, error } = await Bolt Database
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
