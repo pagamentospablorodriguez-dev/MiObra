@@ -68,20 +68,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
+
+
   const signUp = async (email: string, password: string, fullName: string, role: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: role,
-        },
+  // 1. Criamos o usuário no Auth do Supabase passando os metadados CORRETOS
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName, // O Trigger do banco vai ler exatamente daqui
+        role: role,          // E daqui também
       },
-    });
-    
-    if (error) throw error;
-  };
+    },
+  });
+
+  if (error) throw error;
+
+  // IMPORTANTE: Remova qualquer código de 'supabase.from("profiles").insert' que existir aqui.
+  // O Trigger 'on_auth_user_created' que configuramos no banco já faz o insert 
+  // automaticamente usando os dados acima. Tentar fazer manualmente gera o erro de "duplicate key".
+};
+
+
+
+
+  
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
