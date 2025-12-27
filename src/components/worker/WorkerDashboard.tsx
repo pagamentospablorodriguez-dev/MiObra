@@ -149,17 +149,29 @@ function CheckInCard({ onCheckIn }: { onCheckIn: (projectId: string) => void }) 
     if (!profile) return;
 
     try {
+      // Correção: Buscamos as tarefas e os projetos separadamente ou de forma plana
+      // para evitar o erro de filtro em tabelas relacionadas do Supabase
       const { data, error } = await supabase
         .from('tasks')
-        .select('project_id, project:projects(*)')
+        .select(`
+          project_id,
+          projects!inner (
+            id,
+            name,
+            address,
+            status
+          )
+        `)
         .eq('assigned_to', profile.id)
-        .eq('project.status', 'in_progress');
+        .eq('projects.status', 'in_progress');
 
       if (error) throw error;
 
+      // Remove duplicatas de projetos (um trabalhador pode ter várias tarefas no mesmo projeto)
       const uniqueProjects = Array.from(
-        new Map(data?.map(item => [item.project.id, item.project])).values()
-      );
+        new Map(data?.map(item => [item.projects.id, item.projects])).values()
+      ) as Project[];
+      
       setProjects(uniqueProjects);
     } catch (error) {
       console.error('Error loading projects:', error);
