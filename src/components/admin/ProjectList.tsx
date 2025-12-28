@@ -1,50 +1,62 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Project, Profile } from '../../types/database';
-import { Trash2 } from 'lucide-react';
+import { Building2, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 
-export default function ProjectManagement() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [clients, setClients] = useState<Profile[]>([]);
+interface ProjectWithClient extends Project {
+  client: Profile | null;
+  active_workers: number;
+}
+
+export default function ProjectList() {
+  const [projects, setProjects] = useState<ProjectWithClient[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    budget: '',
-    description: '',
-    client_id: '',
-  });
 
   useEffect(() => {
     loadProjects();
-    loadClients();
+
+    const subscription = supabase
+      .channel('projects_list')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
+        loadProjects();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
-
-  const loadClients = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'client')
-        .eq('is_active', true);
-
-      if (error) throw error;
-      setClients(data || []);
-    } catch (error) {
-      console.error('Error loading clients:', error);
-    }
-  };
 
   const loadProjects = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: projectsData, error } = await supabase
         .from('projects')
         .select('*')
-        .order('created_at', { ascending: false });
+        .in('status', ['in_progress', 'planning'])
+        .order('progress_percentage', { ascending: true });
 
       if (error) throw error;
-      setProjects(data || []);
+
+      if (projectsData) {
+        const projectsWithDetails = await Promise.all(
+          projectsData.map(async (project) => {
+            const [clientRes, checkInsRes] = await Promise.all([
+              project.client_id
+                ? supabase.from('profiles').select('*').eq('id', project.client_id).maybeSingle()
+                : Promise.resolve({ data: null }),
+              supabase.from('check_ins').select('*').eq('project_id', project.id).is('check_out_time', null),
+            ]);
+
+            return {
+              ...project,
+              client: clientRes.data,
+              active_workers: checkInsRes.data?.length || 0,
+            };
+          })
+        );
+
+        setProjects(projectsWithDetails);
+      }
     } catch (error) {
       console.error('Error loading projects:', error);
     } finally {
@@ -52,176 +64,144 @@ export default function ProjectManagement() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { error } = await supabase.from('projects').insert({
-        name: formData.name,
-        address: formData.address,
-        budget: parseFloat(formData.budget),
-        spent: 0,
-        description: formData.description || null,
-        status: 'in_progress',
-        progress_percentage: 0,
-        client_id: formData.client_id || null,
-      });
-
-      if (error) throw error;
-
-      setFormData({ name: '', address: '', budget: '', description: '', client_id: '' });
-      setShowForm(false);
-      await loadProjects();
-      alert('Obra criada com sucesso!');
-    } catch (error: any) {
-      console.error('Error creating project:', error);
-      alert('Erro ao criar obra: ' + error.message);
-    }
+  const getStatusColor = (status: string) => {
+    const colors = {
+      planning: 'bg-gray-100 text-gray-700',
+      in_progress: 'bg-blue-100 text-blue-700',
+      paused: 'bg-yellow-100 text-yellow-700',
+      completed: 'bg-green-100 text-green-700',
+    };
+    return colors[status as keyof typeof colors] || colors.planning;
   };
 
-  const handleDelete = async (projectId: string) => {
-    if (!confirm('Tem certeza que deseja deletar esta obra?')) return;
-
-    try {
-      const { error } = await supabase.from('projects').delete().eq('id', projectId);
-      if (error) throw error;
-      await loadProjects();
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      alert('Erro ao deletar obra');
-    }
+  const getStatusLabel = (status: string) => {
+    const labels = {
+      planning: 'Planejamento',
+      in_progress: 'Em Andamento',
+      paused: 'Pausada',
+      completed: 'Concluída',
+    };
+    return labels[status as keyof typeof labels] || status;
   };
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return (
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          + Nova Obra
-        </button>
+    <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">Obras Ativas</h2>
+        <span className="text-sm text-gray-500">{projects.length} em andamento</span>
       </div>
 
-      {showForm && (
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h3 className="text-lg font-bold mb-4">Criar Nova Obra</h3>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cliente (opcional)</label>
-              <select
-                value={formData.client_id}
-                onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+      {projects.length === 0 ? (
+        <div className="text-center py-12">
+          <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500">Nenhuma obra ativa no momento</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {projects.map((project) => {
+            const isOverBudget = project.spent > project.budget;
+            const budgetPercent = (project.spent / project.budget) * 100;
+
+            return (
+              <div
+                key={project.id}
+                className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition"
               >
-                <option value="">Sem cliente</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.full_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Orçamento (€)</label>
-              <input
-                type="number"
-                value={formData.budget}
-                onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                rows={3}
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-              >
-                Criar
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-gray-900">{project.name}</h3>
+                      {isOverBudget && (
+                        <span className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          Acima do orçamento
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600">{project.address}</p>
+                    {project.client && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Cliente: {project.client.full_name}
+                      </p>
+                    )}
+                  </div>
+                  <span className={`px-3 py-1 rounded-lg text-xs font-medium ${getStatusColor(project.status)}`}>
+                    {getStatusLabel(project.status)}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 mb-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <TrendingUp className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs text-gray-600">Progresso</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          style={{ width: `${project.progress_percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-gray-900">
+                        {project.progress_percentage}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-4 h-4 text-green-600" />
+                      <span className="text-xs text-gray-600">Trabalhando</span>
+                    </div>
+                    <p className="text-sm font-bold text-gray-900">
+                      {project.active_workers} {project.active_workers === 1 ? 'pessoa' : 'pessoas'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Building2 className="w-4 h-4 text-purple-600" />
+                      <span className="text-xs text-gray-600">Orçamento</span>
+                    </div>
+                    <p className={`text-sm font-bold ${isOverBudget ? 'text-red-600' : 'text-gray-900'}`}>
+                      {budgetPercent.toFixed(0)}% usado
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">
+                      €{Number(project.spent).toLocaleString()} / €{Number(project.budget).toLocaleString()}
+                    </span>
+                    {project.expected_end_date && (
+                      <span className="text-gray-500">
+                        Prazo: {new Date(project.expected_end_date).toLocaleDateString('pt-BR')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
-
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nome</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Endereço</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Orçamento</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Progresso</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((project) => (
-                <tr key={project.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-3 font-medium">{project.name}</td>
-                  <td className="px-6 py-3 text-sm text-gray-600">{project.address}</td>
-                  
-                  <td className="px-6 py-3">
-  €{Number(project.budget || 0).toLocaleString()}
-</td>
-                  
-                  <td className="px-6 py-3">{project.progress_percentage}%</td>
-                  <td className="px-6 py-3">
-                    <button
-                      onClick={() => handleDelete(project.id)}
-                      className="text-red-600 hover:text-red-700 p-1"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }
