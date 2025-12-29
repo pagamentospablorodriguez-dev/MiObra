@@ -3,8 +3,9 @@ import { ArrowLeft } from 'lucide-react';
 import UserManagement from './UserManagement';
 import ProjectManagement from './ProjectManagement';
 import TaskManagement from './TaskManagement';
+import WorkerStats from './WorkerStats';
 
-type TabType = 'users' | 'projects' | 'tasks';
+type TabType = 'users' | 'projects' | 'tasks' | 'stats';
 
 export default function AdminPanel({ onBack }: { onBack: () => void }) {
   const [activeTab, setActiveTab] = useState<TabType>('users');
@@ -55,11 +56,22 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
         >
           Tarefas
         </button>
+        <button
+          onClick={() => setActiveTab('stats')}
+          className={`px-6 py-3 font-medium transition ${
+            activeTab === 'stats'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Desempenho
+        </button>
       </div>
 
       {activeTab === 'users' && <UserManagement />}
       {activeTab === 'projects' && <ProjectManagement />}
       {activeTab === 'tasks' && <TaskManagement />}
+      {activeTab === 'stats' && <WorkerStats />}
     </div>
   );
 }
