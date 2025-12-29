@@ -18,6 +18,7 @@ export default function TaskManagement() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    specifications: '',
     project_id: '',
     assigned_to: '',
     priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
@@ -74,6 +75,7 @@ export default function TaskManagement() {
           .update({
             title: formData.title,
             description: formData.description || null,
+            specifications: formData.specifications || null,
             project_id: formData.project_id,
             assigned_to: formData.assigned_to || null,
             priority: formData.priority,
@@ -88,6 +90,7 @@ export default function TaskManagement() {
         const { error } = await supabase.from('tasks').insert({
           title: formData.title,
           description: formData.description || null,
+          specifications: formData.specifications || null,
           project_id: formData.project_id,
           assigned_to: formData.assigned_to || null,
           priority: formData.priority,
@@ -122,6 +125,7 @@ export default function TaskManagement() {
     setFormData({
       title: task.title,
       description: task.description || '',
+      specifications: (task as any).specifications || '',
       project_id: task.project_id,
       assigned_to: task.assigned_to || '',
       priority: task.priority,
@@ -149,6 +153,7 @@ export default function TaskManagement() {
     setFormData({
       title: '',
       description: '',
+      specifications: '',
       project_id: '',
       assigned_to: '',
       priority: 'medium',
@@ -210,7 +215,7 @@ export default function TaskManagement() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Tarefas</h2>
-          <p className="text-gray-600 mt-1">Crie e gerencie tarefas para os funcionários</p>
+          <p className="text-gray-600 mt-1">Crie tarefas detalhadas com especificações exatas</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -253,15 +258,36 @@ export default function TaskManagement() {
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição Detalhada
+                  Descrição Geral
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={4}
-                  placeholder="Descreva em detalhes o que precisa ser feito, medidas específicas, materiais necessários, etc."
+                  rows={3}
+                  placeholder="Descrição geral da tarefa..."
                 />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Especificações e Medidas Exatas * 🔑
+                </label>
+                <textarea
+                  value={formData.specifications}
+                  onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
+                  className="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
+                  rows={4}
+                  placeholder="IMPORTANTE: Coloque as medidas EXATAS aqui!
+Ex:
+- Parede: 3 metros de largura x 2.5 metros de altura
+- Cor: Branco gelo (Suvinil código 10001)
+- Material: Tinta PVA premium
+- O funcionário PRECISA enviar foto da medida sendo verificada
+- Acabamento: Sem imperfeições, liso perfeito"
+                  required
+                />
+                <p className="text-xs text-blue-600 mt-1">💡 O funcionário verá isso e enviará fotos das medidas exatas</p>
               </div>
 
               <div>
@@ -374,6 +400,7 @@ export default function TaskManagement() {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tarefa</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Especificações</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Obra</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Funcionário</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
@@ -385,7 +412,7 @@ export default function TaskManagement() {
             <tbody>
               {tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                     Nenhuma tarefa cadastrada
                   </td>
                 </tr>
@@ -399,6 +426,15 @@ export default function TaskManagement() {
                           <p className="text-sm text-gray-600 line-clamp-1">{task.description}</p>
                         )}
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {(task as any).specifications ? (
+                        <p className="text-sm text-blue-600 font-medium line-clamp-2">
+                          {(task as any).specifications}
+                        </p>
+                      ) : (
+                        <span className="text-gray-400">Não especificado</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm">{task.project.name}</td>
                     <td className="px-6 py-4 text-sm">
