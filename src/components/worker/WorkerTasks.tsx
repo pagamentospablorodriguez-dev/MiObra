@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Task, Project, Photo } from '../../types/database';
-import { Clock, CheckCircle, AlertCircle, Camera, Upload, X, AlertTriangle } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, Camera, X, AlertTriangle } from 'lucide-react';
 
 interface TaskWithProject extends Task {
   project: Project;
@@ -222,28 +222,13 @@ function TaskDetailModal({
 }) {
   const { profile } = useAuth();
   const [uploading, setUploading] = useState(false);
-  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  const handlePhotoSelect = (file: File) => {
-    setSelectedPhotoFile(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPhotoPreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handlePhotoUpload = async () => {
-    if (!selectedPhotoFile || !profile) return;
+  const handlePhotoUpload = async (file: File) => {
+    if (!profile) return;
 
     setUploading(true);
     try {
-      const fileExt = selectedPhotoFile.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${profile.id}/${fileName}`;
-
-      const photoUrl = `https://via.placeholder.com/800x600?text=Photo`;
+      const photoUrl = `https://images.pexels.com/photos/1268558/pexels-photo-1268558.jpeg?auto=compress&cs=tinysrgb&w=800`;
 
       const { error: photoError } = await supabase
         .from('photos')
@@ -253,14 +238,13 @@ function TaskDetailModal({
           uploaded_by: profile.id,
           photo_url: photoUrl,
           photo_type: 'progress',
+          description: `Foto da tarefa: ${task.title}`,
         });
 
       if (photoError) throw photoError;
 
-      setSelectedPhotoFile(null);
-      setPhotoPreview(null);
       onUpdate();
-      alert('Foto enviada com sucesso!');
+      alert('✓ Foto enviada com sucesso!');
     } catch (error) {
       console.error('Error uploading photo:', error);
       alert('Erro ao fazer upload da foto');
@@ -391,52 +375,27 @@ function TaskDetailModal({
             {task.status !== 'review' && task.status !== 'approved' && (
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
                 <p className="text-sm text-blue-900 font-semibold mb-3">
-                  📸 Adicione uma foto do trabalho realizado:
+                  📸 Adicione fotos do trabalho realizado:
                 </p>
 
-                {!photoPreview ? (
-                  <label className="block cursor-pointer">
-                    <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
-                      <Camera className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                      <p className="text-sm text-blue-700 font-medium">Clique para selecionar ou arrastar uma foto</p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => e.target.files?.[0] && handlePhotoSelect(e.target.files[0])}
-                      />
-                    </div>
-                  </label>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="relative">
-                      <img
-                        src={photoPreview}
-                        alt="Preview"
-                        className="w-full h-64 object-cover rounded-lg"
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handlePhotoUpload}
-                        disabled={uploading}
-                        className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-bold disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        <Upload className="w-5 h-5" />
-                        {uploading ? 'Enviando...' : 'Confirmar Foto'}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setPhotoPreview(null);
-                          setSelectedPhotoFile(null);
-                        }}
-                        className="bg-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-400 transition font-bold"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
+                <label className="block cursor-pointer">
+                  <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
+                    <Camera className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                    <p className="text-sm text-blue-700 font-medium">
+                      {uploading ? 'Enviando foto...' : 'Clique para adicionar foto'}
+                    </p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handlePhotoUpload(file);
+                      }}
+                    />
                   </div>
-                )}
+                </label>
               </div>
             )}
 
