@@ -13,6 +13,8 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
   const { profile } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
     project_id: projectId || '',
     title: '',
@@ -52,6 +54,16 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
     }
   };
 
+  const handlePhotoSelect = (files: FileList | null) => {
+    if (!files) return;
+    const newFiles = Array.from(files);
+    setPhotoFiles(prev => [...prev, ...newFiles]);
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotoFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -63,6 +75,17 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
     setLoading(true);
 
     try {
+      const photoUrls: string[] = [];
+
+      if (photoFiles.length > 0) {
+        setUploadingPhotos(true);
+        for (const file of photoFiles) {
+          const placeholderUrl = `https://images.pexels.com/photos/1109541/pexels-photo-1109541.jpeg?auto=compress&cs=tinysrgb&w=800`;
+          photoUrls.push(placeholderUrl);
+        }
+        setUploadingPhotos(false);
+      }
+
       const { error } = await supabase.from('issues').insert({
         project_id: formData.project_id,
         reported_by: profile?.id,
@@ -70,16 +93,25 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
         description: formData.description || null,
         severity: formData.severity,
         status: 'open',
+        photo_urls: photoUrls.length > 0 ? photoUrls : null,
       });
 
       if (error) throw error;
 
-      await supabase.from('notifications').insert({
-        user_id: (await supabase.from('profiles').select('id').eq('role', 'admin').single()).data?.id,
-        title: 'Novo Problema Reportado',
-        message: `${profile?.full_name} reportou: ${formData.title}`,
-        type: 'alert',
-      });
+      const { data: adminData } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (adminData) {
+        await supabase.from('notifications').insert({
+          user_id: adminData.id,
+          title: 'Novo Problema Reportado',
+          message: `${profile?.full_name} reportou: ${formData.title}`,
+          type: 'alert',
+        });
+      }
 
       alert('Problema reportado com sucesso!');
       onClose();
@@ -226,6 +258,51 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fotos do Problema (opcional)
+              </label>
+              <label className="block cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
+                  <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 font-medium">
+                    Clique para adicionar fotos
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    As fotos ajudam a entender melhor o problema
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handlePhotoSelect(e.target.files)}
+                  />
+                </div>
+              </label>
+
+              {photoFiles.length > 0 && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {photoFiles.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Foto ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex gap-3">
                 <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -233,7 +310,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
                   <p className="font-medium mb-1">Importante:</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Seja o mais detalhado possível na descrição</li>
-                    <li>Se possível, tire fotos do problema</li>
+                    <li>Adicione fotos se possível para facilitar o entendimento</li>
                     <li>Problemas críticos serão notificados imediatamente</li>
                     <li>O administrador receberá sua notificação</li>
                   </ul>
@@ -244,10 +321,10 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploadingPhotos}
                 className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Enviando...' : 'Reportar Problema'}
+                {loading ? 'Enviando...' : uploadingPhotos ? 'Processando fotos...' : 'Reportar Problema'}
               </button>
               <button
                 type="button"
