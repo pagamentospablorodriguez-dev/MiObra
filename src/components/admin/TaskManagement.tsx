@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Task, Project, Profile } from '../../types/database';
-import { Plus, Edit2, Trash2, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2 } from 'lucide-react';
 
 interface TaskWithDetails extends Task {
   project: Project;
@@ -215,7 +215,7 @@ export default function TaskManagement() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Tarefas</h2>
-          <p className="text-gray-600 mt-1">Crie tarefas detalhadas com especificações exatas</p>
+          <p className="text-gray-600 mt-1">Crie e gerencie tarefas das obras</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -271,23 +271,20 @@ export default function TaskManagement() {
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Especificações e Medidas Exatas * 🔑
+                  Especificações e Medidas Exatas (opcional)
                 </label>
                 <textarea
                   value={formData.specifications}
                   onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
                   className="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                   rows={4}
-                  placeholder="IMPORTANTE: Coloque as medidas EXATAS aqui!
-Ex:
-- Parede: 3 metros de largura x 2.5 metros de altura
-- Cor: Branco gelo (Suvinil código 10001)
-- Material: Tinta PVA premium
-- O funcionário PRECISA enviar foto da medida sendo verificada
-- Acabamento: Sem imperfeições, liso perfeito"
-                  required
+                  placeholder="Exemplo:
+• Parede: 3 metros de largura x 2.5 metros de altura
+• Cor: Branco gelo (Suvinil código 10001)
+• Material: Tinta PVA premium
+• Acabamento: Sem imperfeições, liso perfeito"
                 />
-                <p className="text-xs text-blue-600 mt-1">💡 O funcionário verá isso e enviará fotos das medidas exatas</p>
+                <p className="text-xs text-blue-600 mt-1">💡 Use este campo quando precisar de medidas exatas e acabamentos específicos</p>
               </div>
 
               <div>
@@ -400,7 +397,6 @@ Ex:
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tarefa</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Especificações</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Obra</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Funcionário</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
@@ -412,7 +408,7 @@ Ex:
             <tbody>
               {tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     Nenhuma tarefa cadastrada
                   </td>
                 </tr>
@@ -425,16 +421,10 @@ Ex:
                         {task.description && (
                           <p className="text-sm text-gray-600 line-clamp-1">{task.description}</p>
                         )}
+                        {(task as any).specifications && (
+                          <p className="text-xs text-blue-600 mt-1">✓ Com especificações</p>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {(task as any).specifications ? (
-                        <p className="text-sm text-blue-600 font-medium line-clamp-2">
-                          {(task as any).specifications}
-                        </p>
-                      ) : (
-                        <span className="text-gray-400">Não especificado</span>
-                      )}
                     </td>
                     <td className="px-6 py-4 text-sm">{task.project.name}</td>
                     <td className="px-6 py-4 text-sm">
