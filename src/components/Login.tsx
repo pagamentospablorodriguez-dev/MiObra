@@ -18,7 +18,7 @@ export default function Login() {
     try {
       await signIn(email, password);
     } catch (err: any) {
-      setError('Email ou senha incorretos. Tente novamente.');
+      setError('Email o contraseña incorrectos. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function Login() {
               </div>
             </div>
             <h1 className="text-3xl font-bold mb-2">AlaObra</h1>
-            <p className="text-blue-100">Gestão Profissional de Obras</p>
+            <p className="text-blue-100">Gestión Profesional de Obras</p>
           </div>
 
           <div className="p-8">
@@ -73,14 +73,14 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="seu@email.com"
+                  placeholder="tu@email.com"
                   required
                 />
               </div>
 
               <div>
                 <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Senha
+                  Contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -128,7 +128,7 @@ export default function Login() {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500 font-medium">Acesso de Demonstração</span>
+                  <span className="px-4 bg-white text-gray-500 font-medium">Acceso de Demostración</span>
                 </div>
               </div>
 
@@ -147,7 +147,7 @@ export default function Login() {
                   className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center"
                 >
                   <div className="text-2xl mb-1">👷</div>
-                  <div className="text-xs font-semibold text-gray-700">Funcionário</div>
+                  <div className="text-xs font-semibold text-gray-700">Empleado</div>
                 </button>
                 <button
                   type="button"
@@ -160,7 +160,7 @@ export default function Login() {
               </div>
 
               <p className="text-xs text-gray-500 text-center mt-4">
-                Clique em um perfil para preencher automaticamente
+                Haz clic en un perfil para rellenar automáticamente
               </p>
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function Login() {
 
         <div className="mt-6 text-center">
           <p className="text-white text-sm opacity-90">
-            Sistema completo de gestão e controle de obras
+            Sistema completo de gestión y control de obras
           </p>
         </div>
       </div>
