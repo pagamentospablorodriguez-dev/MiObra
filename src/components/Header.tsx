@@ -79,7 +79,7 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
               <h1 className="text-lg font-bold text-gray-900">AlaObra</h1>
               <p className="text-xs text-gray-500">
                 {profile?.role === 'admin' && 'Administrador'}
-                {profile?.role === 'worker' && 'Funcionário'}
+                {profile?.role === 'worker' && 'Empleado'}
                 {profile?.role === 'client' && 'Cliente'}
               </p>
             </div>
@@ -113,12 +113,12 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
                   <div className="fixed inset-0 z-10" onClick={() => setShowNotifications(false)} />
                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-20">
                     <div className="p-4 border-b border-gray-200">
-                      <h3 className="font-semibold text-gray-900">Notificações</h3>
+                      <h3 className="font-semibold text-gray-900">Notificaciones</h3>
                     </div>
                     <div className="max-h-96 overflow-y-auto">
                       {notifications.length === 0 ? (
                         <div className="p-4 text-center text-gray-500 text-sm">
-                          Nenhuma notificação
+                          Sin notificaciones
                         </div>
                       ) : (
                         notifications.map((notification) => (
@@ -167,7 +167,7 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
                       <p className="font-semibold text-gray-900">{profile?.full_name}</p>
                       <p className="text-sm text-gray-600">
                         {profile?.role === 'admin' && 'Administrador'}
-                        {profile?.role === 'worker' && 'Funcionário'}
+                        {profile?.role === 'worker' && 'Empleado'}
                         {profile?.role === 'client' && 'Cliente'}
                       </p>
                     </div>
@@ -176,7 +176,7 @@ export default function Header({ onAdminPanel }: { onAdminPanel?: () => void }) 
                       className="w-full p-4 text-left text-red-600 hover:bg-red-50 transition flex items-center gap-2"
                     >
                       <LogOut className="w-4 h-4" />
-                      Sair
+                      Salir
                     </button>
                   </div>
                 </>
