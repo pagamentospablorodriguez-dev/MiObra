@@ -68,7 +68,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
     e.preventDefault();
 
     if (!formData.project_id || !formData.title) {
-      alert('Preencha todos os campos obrigatórios');
+      alert('Rellena todos los campos obligatorios');
       return;
     }
 
@@ -107,17 +107,17 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
       if (adminData) {
         await supabase.from('notifications').insert({
           user_id: adminData.id,
-          title: 'Novo Problema Reportado',
-          message: `${profile?.full_name} reportou: ${formData.title}`,
+          title: 'Nuevo Problema Reportado',
+          message: `${profile?.full_name} reportó: ${formData.title}`,
           type: 'alert',
         });
       }
 
-      alert('Problema reportado com sucesso!');
+      alert('¡Problema reportado con éxito!');
       onClose();
     } catch (error: any) {
       console.error('Error reporting issue:', error);
-      alert('Erro ao reportar problema: ' + error.message);
+      alert('Error al reportar problema: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -134,7 +134,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Reportar Problema</h2>
-                <p className="text-sm text-gray-600">Descreva o problema encontrado na obra</p>
+                <p className="text-sm text-gray-600">Describe el problema encontrado en la obra</p>
               </div>
             </div>
             <button
@@ -157,7 +157,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
                 required
                 disabled={!!projectId}
               >
-                <option value="">Selecione a obra</option>
+                <option value="">Selecciona la obra</option>
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
                     {project.name} - {project.address}
@@ -168,7 +168,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Gravidade do Problema *
+                Gravedad del Problema *
               </label>
               <div className="grid grid-cols-4 gap-3">
                 <button
@@ -182,7 +182,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">😊</div>
-                    <div className="text-xs font-medium">Baixa</div>
+                    <div className="text-xs font-medium">Baja</div>
                   </div>
                 </button>
                 <button
@@ -196,7 +196,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">😐</div>
-                    <div className="text-xs font-medium">Média</div>
+                    <div className="text-xs font-medium">Media</div>
                   </div>
                 </button>
                 <button
@@ -232,44 +232,44 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Título do Problema *
+                Título del Problema *
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Ex: Vazamento no banheiro do 2º andar"
+                placeholder="Ej: Fuga en el baño del 2º piso"
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Descrição Detalhada *
+                Descripción Detallada *
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={5}
-                placeholder="Descreva o problema em detalhes: o que aconteceu, onde está localizado, quando foi notado, possível causa, etc."
+                placeholder="Describe el problema en detalle: qué ocurrió, dónde está ubicado, cuándo fue notado, posible causa, etc."
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Fotos do Problema (opcional)
+                Fotos del Problema (opcional)
               </label>
               <label className="block cursor-pointer">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
                   <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600 font-medium">
-                    Clique para adicionar fotos
+                    Haz clic para añadir fotos
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    As fotos ajudam a entender melhor o problema
+                    Las fotos ayudan a entender mejor el problema
                   </p>
                   <input
                     type="file"
@@ -309,10 +309,10 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
                 <div className="text-sm text-yellow-800">
                   <p className="font-medium mb-1">Importante:</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Seja o mais detalhado possível na descrição</li>
-                    <li>Adicione fotos se possível para facilitar o entendimento</li>
-                    <li>Problemas críticos serão notificados imediatamente</li>
-                    <li>O administrador receberá sua notificação</li>
+                    <li>Sé lo más detallado posible en la descripción</li>
+                    <li>Añade fotos si es posible para facilitar la comprensión</li>
+                    <li>Los problemas críticos serán notificados inmediatamente</li>
+                    <li>El administrador recibirá tu notificación</li>
                   </ul>
                 </div>
               </div>
@@ -324,7 +324,7 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
                 disabled={loading || uploadingPhotos}
                 className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Enviando...' : uploadingPhotos ? 'Processando fotos...' : 'Reportar Problema'}
+                {loading ? 'Enviando...' : uploadingPhotos ? 'Procesando fotos...' : 'Reportar Problema'}
               </button>
               <button
                 type="button"
