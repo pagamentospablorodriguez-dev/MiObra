@@ -80,11 +80,11 @@ export default function WorkerTasks() {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      pending: 'Pendente',
-      in_progress: 'Em Andamento',
-      review: 'Em Revisão',
-      approved: 'Aprovada',
-      rejected: 'Recusada',
+      pending: 'Pendiente',
+      in_progress: 'En Curso',
+      review: 'En Revisión',
+      approved: 'Aprobada',
+      rejected: 'Rechazada',
     };
     return labels[status as keyof typeof labels] || status;
   };
@@ -116,13 +116,13 @@ export default function WorkerTasks() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Minhas Tarefas</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Mis Tareas</h2>
 
       {tasks.length === 0 ? (
         <div className="text-center py-12">
           <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-          <p className="text-gray-500 text-lg">Nenhuma tarefa pendente</p>
-          <p className="text-sm text-gray-400 mt-1">Parabéns! Todas as suas tarefas foram concluídas</p>
+          <p className="text-gray-500 text-lg">Ninguna tarea pendiente</p>
+          <p className="text-sm text-gray-400 mt-1">¡Felicidades! Todas tus tareas están completadas</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -149,7 +149,7 @@ export default function WorkerTasks() {
                   )}
                   {(task as any).specifications && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2 text-sm">
-                      <p className="font-semibold text-blue-900 mb-1">📋 Especificações Exatas:</p>
+                      <p className="font-semibold text-blue-900 mb-1">📋 Especificaciones Exactas:</p>
                       <p className="text-blue-800 whitespace-pre-wrap">{(task as any).specifications}</p>
                     </div>
                   )}
@@ -161,9 +161,9 @@ export default function WorkerTasks() {
 
               {task.status === 'rejected' && task.review_notes && (
                 <div className="bg-red-50 border border-red-300 rounded-lg p-3 mb-3">
-                  <p className="text-sm font-semibold text-red-900 mb-1">⚠️ Motivo da Rejeição:</p>
+                  <p className="text-sm font-semibold text-red-900 mb-1">⚠️ Motivo del Rechazo:</p>
                   <p className="text-red-800">{task.review_notes}</p>
-                  <p className="text-xs text-red-700 mt-2">Faça as correções solicitadas e envie novamente para revisão</p>
+                  <p className="text-xs text-red-700 mt-2">Realiza las correcciones solicitadas y envía nuevamente para revisión</p>
                 </div>
               )}
 
@@ -173,7 +173,7 @@ export default function WorkerTasks() {
                   {task.due_date && (
                     <div className="flex items-center gap-1 text-gray-600">
                       <Clock className="w-4 h-4" />
-                      <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
+                      <span>{new Date(task.due_date).toLocaleDateString('es-ES')}</span>
                     </div>
                   )}
                 </div>
@@ -192,7 +192,7 @@ export default function WorkerTasks() {
               {task.status !== 'approved' && task.status !== 'rejected' && task.photos.length === 0 && (
                 <div className="flex items-center gap-2 mt-3 text-sm text-orange-600 font-medium">
                   <AlertCircle className="w-4 h-4" />
-                  <span>Nenhuma foto enviada ainda</span>
+                  <span>Ninguna foto enviada aún</span>
                 </div>
               )}
             </div>
@@ -238,16 +238,16 @@ function TaskDetailModal({
           uploaded_by: profile.id,
           photo_url: photoUrl,
           photo_type: 'progress',
-          description: `Foto da tarefa: ${task.title}`,
+          description: `Foto de la tarea: ${task.title}`,
         });
 
       if (photoError) throw photoError;
 
       onUpdate();
-      alert('✓ Foto enviada com sucesso!');
+      alert('✓ ¡Foto enviada con éxito!');
     } catch (error) {
       console.error('Error uploading photo:', error);
-      alert('Erro ao fazer upload da foto');
+      alert('Error al subir la foto');
     } finally {
       setUploading(false);
     }
@@ -270,7 +270,7 @@ function TaskDetailModal({
 
   const handleSubmitForReview = async () => {
     if (task.photos.length === 0) {
-      alert('⚠️ IMPORTANTE: Você PRECISA enviar pelo menos UMA FOTO antes de enviar a tarefa para revisão!\n\nAs fotos são a prova visual do trabalho realizado.');
+      alert('⚠️ IMPORTANTE: DEBES enviar al menos UNA FOTO antes de enviar la tarea para revisión!\n\nLas fotos son la prueba visual del trabajo realizado.');
       return;
     }
 
@@ -284,14 +284,14 @@ function TaskDetailModal({
 
       await supabase.from('notifications').insert({
         user_id: task.project.client_id,
-        title: 'Tarefa Concluída e Aguardando Aprovação',
-        message: `A tarefa "${task.title}" foi concluída e aguarda sua aprovação`,
+        title: 'Tarea Completada y Esperando Aprobación',
+        message: `La tarea "${task.title}" ha sido completada y espera tu aprobación`,
         type: 'info',
       });
 
       onUpdate();
       onClose();
-      alert('✓ Tarefa enviada para revisão! O administrador vai avaliar em breve.');
+      alert('✓ ¡Tarea enviada para revisión! El administrador la evaluará pronto.');
     } catch (error) {
       console.error('Error submitting task:', error);
     }
@@ -319,12 +319,12 @@ function TaskDetailModal({
 
           {(task as any).specifications && (
             <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-5">
-              <p className="font-bold text-blue-900 mb-3 text-lg">📋 Especificações e Medidas EXATAS:</p>
+              <p className="font-bold text-blue-900 mb-3 text-lg">📋 Especificaciones y Medidas EXACTAS:</p>
               <p className="text-blue-800 whitespace-pre-wrap font-medium">{(task as any).specifications}</p>
               <p className="text-xs text-blue-700 mt-3 border-t border-blue-200 pt-3">
-                ✓ Verifique as medidas com muito cuidado
-                <br />✓ Tire fotos da medida sendo verificada
-                <br />✓ Certifique-se que o acabamento está perfeito conforme especificado
+                ✓ Verifica las medidas con mucho cuidado
+                <br />✓ Toma fotos de la medida siendo verificada
+                <br />✓ Asegúrate de que el acabado es perfecto según lo especificado
               </p>
             </div>
           )}
@@ -336,9 +336,9 @@ function TaskDetailModal({
             </div>
             {task.due_date && (
               <div className="bg-gray-50 rounded-lg p-4">
-                <span className="text-gray-600">Prazo:</span>
+                <span className="text-gray-600">Plazo:</span>
                 <p className="font-bold text-gray-900">
-                  {new Date(task.due_date).toLocaleDateString('pt-BR')}
+                  {new Date(task.due_date).toLocaleDateString('es-ES')}
                 </p>
               </div>
             )}
@@ -348,11 +348,11 @@ function TaskDetailModal({
             <div className="bg-red-50 border-2 border-red-300 rounded-xl p-5">
               <p className="text-sm font-bold text-red-900 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5" />
-                Motivo da Rejeição:
+                Motivo del Rechazo:
               </p>
               <p className="text-red-800">{task.review_notes}</p>
               <p className="text-xs text-red-700 mt-3">
-                ⚠️ Por favor, faça as correções solicitadas acima e envie novamente para revisão
+                ⚠️ Por favor, realiza las correcciones solicitadas arriba y envía nuevamente para revisión
               </p>
             </div>
           )}
@@ -361,28 +361,26 @@ function TaskDetailModal({
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-bold text-gray-900 flex items-center gap-2">
                 <Camera className="w-5 h-5" />
-                Fotos do Trabalho
+                Fotos del Trabajo
               </h4>
               <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                task.photos.length > 0
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-700'
+                task.photos.length > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
               }`}>
-                {task.photos.length > 0 ? `✓ ${task.photos.length} foto(s)` : '⚠️ Nenhuma foto'}
+                {task.photos.length > 0 ? `✓ ${task.photos.length} foto(s)` : '⚠️ Ninguna foto'}
               </span>
             </div>
 
             {task.status !== 'review' && task.status !== 'approved' && (
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
                 <p className="text-sm text-blue-900 font-semibold mb-3">
-                  📸 Adicione fotos do trabalho realizado:
+                  📸 Añade fotos del trabajo realizado:
                 </p>
 
                 <label className="block cursor-pointer">
                   <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
                     <Camera className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                     <p className="text-sm text-blue-700 font-medium">
-                      {uploading ? 'Enviando foto...' : 'Clique para adicionar foto'}
+                      {uploading ? 'Enviando foto...' : 'Haz clic para añadir foto'}
                     </p>
                     <input
                       type="file"
@@ -405,12 +403,12 @@ function TaskDetailModal({
                   <div key={photo.id} className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative group">
                     <img
                       src={photo.photo_url}
-                      alt={photo.description || 'Foto da tarefa'}
+                      alt={photo.description || 'Foto de la tarea'}
                       className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
                       <p className="text-white text-xs">
-                        {new Date(photo.created_at).toLocaleDateString('pt-BR')}
+                        {new Date(photo.created_at).toLocaleDateString('es-ES')}
                       </p>
                     </div>
                   </div>
@@ -419,7 +417,7 @@ function TaskDetailModal({
             ) : (
               <div className="text-center py-8 bg-gray-50 rounded-lg">
                 <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Nenhuma foto enviada ainda</p>
+                <p className="text-sm text-gray-500">Ninguna foto enviada aún</p>
               </div>
             )}
           </div>
@@ -430,30 +428,33 @@ function TaskDetailModal({
                 onClick={handleStartTask}
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold"
               >
-                Começar Tarefa
+                Comenzar Tarea
               </button>
             )}
+
             {task.status === 'in_progress' && (
               <button
                 onClick={handleSubmitForReview}
                 className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-bold"
               >
-                Enviar para Revisão
+                Enviar para Revisión
               </button>
             )}
+
             {task.status === 'rejected' && (
               <button
                 onClick={handleSubmitForReview}
                 className="flex-1 bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition font-bold"
               >
-                Enviar Novamente (Corrigida)
+                Enviar Nuevamente (Corregida)
               </button>
             )}
+
             <button
               onClick={onClose}
               className="bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition font-bold"
             >
-              Fechar
+              Cerrar
             </button>
           </div>
         </div>
