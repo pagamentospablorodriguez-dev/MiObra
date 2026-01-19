@@ -67,14 +67,14 @@ export default function WorkerDashboard() {
       setActiveCheckIn(data);
     } catch (error) {
       console.error('Error checking in:', error);
-      alert('Erro ao fazer check-in. Tente novamente.');
+      alert('Error al registrar entrada. Inténtalo de nuevo.');
     }
   };
 
   const handleCheckOut = async (notes?: string) => {
     if (!activeCheckIn) return;
 
-    if (!confirm('Tem certeza que deseja encerrar seu trabalho?')) return;
+    if (!confirm('¿Estás seguro de que deseas finalizar tu jornada?')) return;
 
     try {
       const { error } = await supabase
@@ -87,10 +87,10 @@ export default function WorkerDashboard() {
 
       if (error) throw error;
       setActiveCheckIn(null);
-      alert('Trabalho encerrado! Até amanhã!');
+      alert('¡Jornada finalizada! ¡Hasta mañana!');
     } catch (error) {
       console.error('Error checking out:', error);
-      alert('Erro ao fazer check-out. Tente novamente.');
+      alert('Error al registrar salida. Inténtalo de nuevo.');
     }
   };
 
@@ -117,10 +117,10 @@ export default function WorkerDashboard() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Olá, {profile?.full_name}!
+            ¡Hola, {profile?.full_name}!
           </h1>
           <p className="text-lg text-gray-600">
-            {activeCheckIn ? '👷 Você está trabalhando' : '📱 Faça check-in para começar seu dia'}
+            {activeCheckIn ? '👷 Estás trabajando' : '📱 Registra tu entrada para comenzar tu día'}
           </p>
         </div>
 
@@ -194,29 +194,29 @@ function CheckInSection({ onCheckIn }: { onCheckIn: (projectId: string) => void 
           <LogIn className="w-8 h-8 text-blue-600" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Começar o Trabalho</h2>
-          <p className="text-gray-600 mt-1">Selecione a obra onde você vai trabalhar hoje</p>
+          <h2 className="text-2xl font-bold text-gray-900">Comenzar Trabajo</h2>
+          <p className="text-gray-600 mt-1">Selecciona la obra donde trabajarás hoy</p>
         </div>
       </div>
 
       <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
-        <h3 className="font-semibold text-blue-900 mb-3">📋 Instruções:</h3>
+        <h3 className="font-semibold text-blue-900 mb-3">📋 Instrucciones:</h3>
         <ol className="space-y-2 text-blue-800">
           <li className="flex gap-2">
             <span className="font-bold">1.</span>
-            <span>Quando chegar na obra, selecione qual obra você está</span>
+            <span>Cuando llegues a la obra, selecciona en cuál estás</span>
           </li>
           <li className="flex gap-2">
             <span className="font-bold">2.</span>
-            <span>Clique no botão verde "Iniciar Trabalho"</span>
+            <span>Haz clic en el botón verde "Iniciar Trabajo"</span>
           </li>
           <li className="flex gap-2">
             <span className="font-bold">3.</span>
-            <span>O sistema vai começar a contar suas horas automaticamente</span>
+            <span>El sistema empezará a contar tus horas automáticamente</span>
           </li>
           <li className="flex gap-2">
             <span className="font-bold">4.</span>
-            <span>Quando terminar o dia, clique em "Encerrar Trabalho"</span>
+            <span>Cuando termines el día, haz clic en "Finalizar Trabajo"</span>
           </li>
         </ol>
       </div>
@@ -224,18 +224,18 @@ function CheckInSection({ onCheckIn }: { onCheckIn: (projectId: string) => void 
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-500 mt-2">Carregando obras...</p>
+          <p className="text-gray-500 mt-2">Cargando obras...</p>
         </div>
       ) : projects.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-xl">
-          <p className="text-gray-600">Você não tem obras atribuídas no momento.</p>
-          <p className="text-sm text-gray-500 mt-1">Entre em contato com seu supervisor.</p>
+          <p className="text-gray-600">No tienes obras asignadas en este momento.</p>
+          <p className="text-sm text-gray-500 mt-1">Contacta con tu supervisor.</p>
         </div>
       ) : (
         <>
           <div className="mb-6">
             <label className="block text-lg font-semibold text-gray-900 mb-3">
-              Selecione a Obra:
+              Selecciona la Obra:
             </label>
             <div className="space-y-3">
               {projects.map((project) => (
@@ -274,7 +274,7 @@ function CheckInSection({ onCheckIn }: { onCheckIn: (projectId: string) => void 
             className="w-full bg-green-600 text-white py-5 rounded-xl font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-3"
           >
             <LogIn className="w-6 h-6" />
-            {selectedProject ? 'Iniciar Trabalho' : 'Selecione uma obra primeiro'}
+            {selectedProject ? 'Iniciar Trabajo' : 'Selecciona una obra primero'}
           </button>
         </>
       )}
@@ -308,7 +308,7 @@ function ActiveWorkSection({
               <Clock className="w-8 h-8" />
             </div>
             <div>
-              <p className="text-green-100 text-sm font-medium">Tempo Trabalhado Hoje</p>
+              <p className="text-green-100 text-sm font-medium">Tiempo Trabajado Hoy</p>
               <p className="text-4xl font-bold">{workingTime}</p>
             </div>
           </div>
@@ -317,14 +317,14 @@ function ActiveWorkSection({
             className="bg-white bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2 backdrop-blur"
           >
             <LogOut className="w-5 h-5" />
-            Encerrar Trabalho
+            Finalizar Trabajo
           </button>
         </div>
 
         <div className="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur">
-          <p className="text-sm text-green-100 mb-2">✅ Você está trabalhando</p>
+          <p className="text-sm text-green-100 mb-2">✅ Estás trabajando</p>
           <p className="text-xs text-green-100">
-            O sistema está registrando suas horas automaticamente. Quando terminar, clique em "Encerrar Trabalho".
+            El sistema está registrando tus horas automáticamente. Cuando termines, haz clic en "Finalizar Trabajo".
           </p>
         </div>
       </div>
@@ -341,7 +341,7 @@ function ActiveWorkSection({
             <span className="font-semibold text-gray-900">Reportar Problema</span>
           </div>
           <p className="text-sm text-gray-600">
-            Encontrou algum problema na obra? Reporte aqui.
+            ¿Encontraste algún problema en la obra? Repórtalo aquí.
           </p>
         </button>
 
@@ -350,10 +350,10 @@ function ActiveWorkSection({
             <div className="bg-blue-100 p-3 rounded-lg">
               <ListTodo className="w-6 h-6 text-blue-600" />
             </div>
-            <span className="font-semibold text-gray-900">Minhas Tarefas</span>
+            <span className="font-semibold text-gray-900">Mis Tareas</span>
           </div>
           <p className="text-sm text-gray-600">
-            Veja suas tarefas abaixo e envie fotos quando concluir.
+            Consulta tus tareas abajo y envía fotos al completarlas.
           </p>
         </div>
       </div>
@@ -361,25 +361,25 @@ function ActiveWorkSection({
       {showCheckOutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Encerrar Trabalho</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Finalizar Trabajo</h3>
 
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-              <p className="text-green-800 font-medium mb-2">Tempo trabalhado: {workingTime}</p>
+              <p className="text-green-800 font-medium mb-2">Tiempo trabajado: {workingTime}</p>
               <p className="text-sm text-green-700">
-                Suas horas serão salvas automaticamente.
+                Tus horas se guardarán automáticamente.
               </p>
             </div>
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Observações do dia (opcional)
+                Observaciones del día (opcional)
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={4}
-                placeholder="O que você fez hoje? Ex: Instalei 5 portas, preparei as paredes para pintura..."
+                placeholder="¿Qué hiciste hoy? Ej: Instalé 5 puertas, preparé las paredes para pintar..."
               />
             </div>
 
