@@ -85,48 +85,48 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Painel de Controle
+            Panel de Control
           </h1>
           <p className="text-gray-600">
-            Visão completa de todas as suas obras
+            Visión completa de todas sus obras
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             icon={<Building2 className="w-6 h-6" />}
-            title="Obras Ativas"
+            title="Obras Activas"
             value={stats.activeProjects}
             color="blue"
           />
           <StatCard
             icon={<Users className="w-6 h-6" />}
-            title="Trabalhando Agora"
+            title="Trabajando Ahora"
             value={stats.activeCheckIns}
-            subtitle={`de ${stats.totalWorkers} funcionários`}
+            subtitle={`de ${stats.totalWorkers} empleados`}
             color="green"
           />
           <StatCard
             icon={<AlertCircle className="w-6 h-6" />}
-            title="Problemas Abertos"
+            title="Problemas Abiertos"
             value={stats.openIssues}
             color={stats.openIssues > 0 ? 'red' : 'gray'}
           />
           <StatCard
             icon={<Clock className="w-6 h-6" />}
-            title="Aguardando Aprovação"
+            title="Esperando Aprobación"
             value={stats.pendingTasks}
             color="yellow"
           />
           <StatCard
             icon={<CheckCircle className="w-6 h-6" />}
-            title="Concluídos Hoje"
+            title="Completados Hoy"
             value={stats.todayProgress}
             color="green"
           />
           <StatCard
             icon={<TrendingUp className="w-6 h-6" />}
-            title="Progresso Médio"
+            title="Progreso Medio"
             value="78%"
             color="blue"
           />
