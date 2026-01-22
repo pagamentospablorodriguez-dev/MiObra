@@ -54,13 +54,13 @@ export default function UserManagement() {
 
       if (signUpError) throw signUpError;
 
-      alert('Usuário criado com sucesso!');
+      alert('¡Usuario creado con éxito!');
       setShowForm(false);
       setFormData({ email: '', password: '', full_name: '', role: 'worker', phone: '' });
       loadUsers();
     } catch (error: any) {
       console.error('Error creating user:', error);
-      alert('Erro ao criar usuário: ' + error.message);
+      alert('Error al crear el usuario: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -94,12 +94,12 @@ export default function UserManagement() {
 
       if (error) throw error;
 
-      alert('Usuário atualizado com sucesso!');
+      alert('¡Usuario actualizado con éxito!');
       resetForm();
       loadUsers();
     } catch (error: any) {
       console.error('Error updating user:', error);
-      alert('Erro ao atualizar usuário: ' + error.message);
+      alert('Error al actualizar el usuario: ' + error.message);
     }
   };
 
@@ -114,21 +114,21 @@ export default function UserManagement() {
       loadUsers();
     } catch (error) {
       console.error('Error toggling user status:', error);
-      alert('Erro ao alterar status do usuário');
+      alert('Error al cambiar el estado del usuario');
     }
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm('Tem certeza que deseja deletar este usuário? Esta ação não pode ser desfeita.')) return;
+    if (!confirm('¿Está seguro de que desea eliminar este usuario? Esta acción no se puede deshacer.')) return;
 
     try {
       const { error } = await supabase.from('profiles').delete().eq('id', userId);
       if (error) throw error;
-      alert('Usuário deletado com sucesso!');
+      alert('¡Usuario eliminado con éxito!');
       loadUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Erro ao deletar usuário');
+      alert('Error al eliminar el usuario');
     }
   };
 
@@ -139,22 +139,22 @@ export default function UserManagement() {
   };
 
   if (loading && users.length === 0) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return <div className="text-center py-8">Cargando...</div>;
   }
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Usuários</h2>
-          <p className="text-gray-600 mt-1">Crie e gerencie funcionários, clientes e administradores</p>
+          <h2 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h2>
+          <p className="text-gray-600 mt-1">Cree y gestione empleados, clientes y administradores</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Novo Usuário
+          Nuevo Usuario
         </button>
       </div>
 
@@ -162,7 +162,7 @@ export default function UserManagement() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">
-              {editingUser ? 'Editar Usuário' : 'Criar Novo Usuário'}
+              {editingUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
             </h3>
             <button
               onClick={resetForm}
@@ -178,7 +178,7 @@ export default function UserManagement() {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email *
+                      Correo electrónico *
                     </label>
                     <input
                       type="email"
@@ -190,7 +190,7 @@ export default function UserManagement() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Senha *
+                      Contraseña *
                     </label>
                     <input
                       type="password"
@@ -206,7 +206,7 @@ export default function UserManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome Completo *
+                  Nombre Completo *
                 </label>
                 <input
                   type="text"
@@ -219,7 +219,7 @@ export default function UserManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Telefone
+                  Teléfono
                 </label>
                 <input
                   type="tel"
@@ -232,7 +232,7 @@ export default function UserManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tipo de Usuário *
+                  Tipo de Usuario *
                 </label>
                 <select
                   value={formData.role}
@@ -240,7 +240,7 @@ export default function UserManagement() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="admin">Administrador</option>
-                  <option value="worker">Funcionário</option>
+                  <option value="worker">Empleado</option>
                   <option value="client">Cliente</option>
                 </select>
               </div>
@@ -252,7 +252,7 @@ export default function UserManagement() {
                 disabled={loading}
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
               >
-                {editingUser ? 'Atualizar Usuário' : 'Criar Usuário'}
+                {editingUser ? 'Actualizar Usuario' : 'Crear Usuario'}
               </button>
               <button
                 type="button"
@@ -271,12 +271,12 @@ export default function UserManagement() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nome</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Telefone</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nombre</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Teléfono</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tipo</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Avaliação</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ações</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Calificación</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -296,7 +296,7 @@ export default function UserManagement() {
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium">
                       {user.role === 'admin' && 'Administrador'}
-                      {user.role === 'worker' && 'Funcionário'}
+                      {user.role === 'worker' && 'Empleado'}
                       {user.role === 'client' && 'Cliente'}
                     </span>
                   </td>
@@ -309,7 +309,7 @@ export default function UserManagement() {
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {user.is_active ? 'Ativo' : 'Inativo'}
+                      {user.is_active ? 'Activo' : 'Inactivo'}
                     </button>
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -335,7 +335,7 @@ export default function UserManagement() {
                       <button
                         onClick={() => handleDelete(user.id)}
                         className="text-red-600 hover:text-red-700 p-1"
-                        title="Deletar"
+                        title="Eliminar"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
