@@ -82,19 +82,19 @@ export default function ProjectManagement() {
           .eq('id', editingProject.id);
 
         if (error) throw error;
-        alert('Obra atualizada com sucesso!');
+        alert('¡Obra actualizada con éxito!');
       } else {
         const { error } = await supabase.from('projects').insert(projectData);
 
         if (error) throw error;
-        alert('Obra criada com sucesso!');
+        alert('¡Obra creada con éxito!');
       }
 
       resetForm();
       await loadProjects();
     } catch (error: any) {
       console.error('Error saving project:', error);
-      alert('Erro ao salvar obra: ' + error.message);
+      alert('Error al guardar la obra: ' + error.message);
     }
   };
 
@@ -116,16 +116,16 @@ export default function ProjectManagement() {
   };
 
   const handleDelete = async (projectId: string) => {
-    if (!confirm('Tem certeza que deseja deletar esta obra? Todas as tarefas, fotos e dados relacionados serão perdidos.')) return;
+    if (!confirm('¿Está seguro de que desea eliminar esta obra? Todas las tareas, fotos y datos relacionados se perderán.')) return;
 
     try {
       const { error } = await supabase.from('projects').delete().eq('id', projectId);
       if (error) throw error;
-      alert('Obra deletada com sucesso!');
+      alert('¡Obra eliminada con éxito!');
       await loadProjects();
     } catch (error) {
       console.error('Error deleting project:', error);
-      alert('Erro ao deletar obra');
+      alert('Error al eliminar la obra');
     }
   };
 
@@ -158,31 +158,31 @@ export default function ProjectManagement() {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      planning: 'Planejamento',
-      in_progress: 'Em Andamento',
+      planning: 'Planificación',
+      in_progress: 'En Curso',
       paused: 'Pausada',
-      completed: 'Concluída',
+      completed: 'Completada',
     };
     return labels[status as keyof typeof labels] || status;
   };
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return <div className="text-center py-8">Cargando...</div>;
   }
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Obras</h2>
-          <p className="text-gray-600 mt-1">Crie e gerencie todas as obras e seus detalhes</p>
+          <h2 className="text-2xl font-bold text-gray-900">Gestión de Obras</h2>
+          <p className="text-gray-600 mt-1">Cree y gestione todas las obras y sus detalles</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Nova Obra
+          Nueva Obra
         </button>
       </div>
 
@@ -190,7 +190,7 @@ export default function ProjectManagement() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">
-              {editingProject ? 'Editar Obra' : 'Criar Nova Obra'}
+              {editingProject ? 'Editar Obra' : 'Crear Nueva Obra'}
             </h3>
             <button
               onClick={resetForm}
@@ -204,28 +204,28 @@ export default function ProjectManagement() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome da Obra *
+                  Nombre de la Obra *
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Ex: Casa da Família Silva"
+                  placeholder="Ej: Casa de la Familia Silva"
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Endereço *
+                  Dirección *
                 </label>
                 <input
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Rua, número, bairro, cidade"
+                  placeholder="Calle, número, barrio, ciudad"
                   required
                 />
               </div>
@@ -239,7 +239,7 @@ export default function ProjectManagement() {
                   onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="">Sem cliente atribuído</option>
+                  <option value="">Sin cliente asignado</option>
                   {clients.map((client) => (
                     <option key={client.id} value={client.id}>
                       {client.full_name}
@@ -250,23 +250,23 @@ export default function ProjectManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
+                  Estado
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="planning">Planejamento</option>
-                  <option value="in_progress">Em Andamento</option>
+                  <option value="planning">Planificación</option>
+                  <option value="in_progress">En Curso</option>
                   <option value="paused">Pausada</option>
-                  <option value="completed">Concluída</option>
+                  <option value="completed">Completada</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Orçamento Total (€) *
+                  Presupuesto Total (€) *
                 </label>
                 <input
                   type="number"
@@ -282,7 +282,7 @@ export default function ProjectManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Gasto Atual (€)
+                  Gasto Actual (€)
                 </label>
                 <input
                   type="number"
@@ -297,7 +297,7 @@ export default function ProjectManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data de Início
+                  Fecha de Inicio
                 </label>
                 <input
                   type="date"
@@ -309,7 +309,7 @@ export default function ProjectManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Previsão de Término
+                  Previsión de Finalización
                 </label>
                 <input
                   type="date"
@@ -321,7 +321,7 @@ export default function ProjectManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Progresso (0-100%)
+                  Progreso (0-100%)
                 </label>
                 <input
                   type="number"
@@ -336,14 +336,14 @@ export default function ProjectManagement() {
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição da Obra
+                  Descripción de la Obra
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={3}
-                  placeholder="Descreva os detalhes da obra, especificações, etc."
+                  placeholder="Describa los detalles de la obra, especificaciones, etc."
                 />
               </div>
             </div>
@@ -353,7 +353,7 @@ export default function ProjectManagement() {
                 type="submit"
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium"
               >
-                {editingProject ? 'Atualizar Obra' : 'Criar Obra'}
+                {editingProject ? 'Actualizar Obra' : 'Crear Obra'}
               </button>
               <button
                 type="button"
@@ -374,18 +374,18 @@ export default function ProjectManagement() {
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Obra</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Cliente</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Progresso</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Orçamento</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Progreso</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Presupuesto</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Gasto</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ações</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {projects.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                    Nenhuma obra cadastrada
+                    Ninguna obra registrada
                   </td>
                 </tr>
               ) : (
@@ -400,7 +400,7 @@ export default function ProjectManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        {client ? client.full_name : <span className="text-gray-400">Sem cliente</span>}
+                        {client ? client.full_name : <span className="text-gray-400">Sin cliente</span>}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
@@ -419,15 +419,15 @@ export default function ProjectManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        €{Number(project.budget || 0).toLocaleString()}
+                        €{Number(project.budget || 0).toLocaleString('es-ES')}
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm">
                           <span className={project.spent > project.budget ? 'text-red-600 font-medium' : 'text-gray-900'}>
-                            €{Number(project.spent || 0).toLocaleString()}
+                            €{Number(project.spent || 0).toLocaleString('es-ES')}
                           </span>
                           {project.spent > project.budget && (
-                            <p className="text-xs text-red-600">Acima do orçamento!</p>
+                            <p className="text-xs text-red-600">¡Por encima del presupuesto!</p>
                           )}
                         </div>
                       </td>
@@ -443,7 +443,7 @@ export default function ProjectManagement() {
                           <button
                             onClick={() => handleDelete(project.id)}
                             className="text-red-600 hover:text-red-700 p-1"
-                            title="Deletar"
+                            title="Eliminar"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
