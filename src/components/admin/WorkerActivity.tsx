@@ -49,7 +49,7 @@ export default function WorkerActivity() {
   };
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('pt-BR', {
+    return new Date(timestamp).toLocaleTimeString('es-ES', {
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -80,11 +80,11 @@ export default function WorkerActivity() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Atividade dos Funcionários</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-6">Actividad de los Empleados</h2>
 
       {checkIns.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">Nenhum check-in hoje</p>
+          <p className="text-gray-500">Ningún check-in hoy</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -118,7 +118,7 @@ export default function WorkerActivity() {
                   <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
                     {!checkIn.check_out_time ? (
                       <span className="text-green-600 font-medium">
-                        Trabalhando: {getWorkingHours(checkIn)}
+                        Trabajando: {getWorkingHours(checkIn)}
                       </span>
                     ) : (
                       <span>Total: {getWorkingHours(checkIn)}</span>
