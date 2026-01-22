@@ -81,8 +81,8 @@ export default function TaskApproval() {
 
       await supabase.from('notifications').insert({
         user_id: selectedTask?.assigned_to,
-        title: 'Tarefa Aprovada!',
-        message: `Sua tarefa "${selectedTask?.title}" foi aprovada com nota ${qualityScore}/10`,
+        title: '¡Tarea Aprobada!',
+        message: `Su tarea "${selectedTask?.title}" fue aprobada con nota ${qualityScore}/10`,
         type: 'success',
       });
 
@@ -107,8 +107,8 @@ export default function TaskApproval() {
 
       await supabase.from('notifications').insert({
         user_id: selectedTask?.assigned_to,
-        title: 'Tarefa Recusada',
-        message: `Sua tarefa "${selectedTask?.title}" precisa de correções: ${reviewNotes}`,
+        title: 'Tarea Rechazada',
+        message: `Su tarea "${selectedTask?.title}" necesita correcciones: ${reviewNotes}`,
         type: 'warning',
       });
 
@@ -137,10 +137,10 @@ export default function TaskApproval() {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Aguardando Aprovação</h2>
+        <h2 className="text-xl font-bold text-gray-900">Esperando Aprobación</h2>
         {tasks.length > 0 && (
           <span className="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded">
-            {tasks.length} tarefas
+            {tasks.length} tareas
           </span>
         )}
       </div>
@@ -148,7 +148,7 @@ export default function TaskApproval() {
       {tasks.length === 0 ? (
         <div className="text-center py-12">
           <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-          <p className="text-gray-500">Tudo aprovado!</p>
+          <p className="text-gray-500">¡Todo aprobado!</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -169,7 +169,7 @@ export default function TaskApproval() {
                   {task.photos.length > 0 && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Image className="w-4 h-4" />
-                      <span>{task.photos.length} foto(s) anexada(s)</span>
+                      <span>{task.photos.length} foto(s) adjunta(s)</span>
                     </div>
                   )}
                 </div>
@@ -223,7 +223,7 @@ function TaskReviewModal({
 
           <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
             <div>
-              <span className="text-gray-600">Funcionário:</span>
+              <span className="text-gray-600">Empleado:</span>
               <p className="font-medium">{task.worker?.full_name}</p>
             </div>
             <div>
@@ -234,13 +234,13 @@ function TaskReviewModal({
 
           {task.photos.length > 0 && (
             <div className="mb-6">
-              <h4 className="font-semibold mb-3">Fotos do Trabalho</h4>
+              <h4 className="font-semibold mb-3">Fotos del Trabajo</h4>
               <div className="grid grid-cols-2 gap-4">
                 {task.photos.map((photo) => (
                   <div key={photo.id} className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                     <img
                       src={photo.photo_url}
-                      alt={photo.description || 'Foto da tarefa'}
+                      alt={photo.description || 'Foto de la tarea'}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -251,7 +251,7 @@ function TaskReviewModal({
 
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nota de Qualidade (0-10)
+              Nota de Calidad (0-10)
             </label>
             <input
               type="range"
@@ -268,14 +268,14 @@ function TaskReviewModal({
 
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Observações (opcional)
+              Observaciones (opcional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={3}
-              placeholder="Comentários sobre o trabalho..."
+              placeholder="Comentarios sobre el trabajo..."
             />
           </div>
 
@@ -285,26 +285,26 @@ function TaskReviewModal({
               className="flex-1 bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition flex items-center justify-center gap-2"
             >
               <CheckCircle className="w-5 h-5" />
-              Aprovar
+              Aprobar
             </button>
             <button
               onClick={() => {
                 if (notes.trim()) {
                   onReject(task.id, notes);
                 } else {
-                  alert('Por favor, adicione observações sobre o que precisa ser corrigido');
+                  alert('Por favor, añada observaciones sobre lo que necesita ser corregido');
                 }
               }}
               className="flex-1 bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition flex items-center justify-center gap-2"
             >
               <XCircle className="w-5 h-5" />
-              Recusar
+              Rechazar
             </button>
             <button
               onClick={onClose}
               className="bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-300 transition"
             >
-              Fechar
+              Cerrar
             </button>
           </div>
         </div>
