@@ -102,14 +102,14 @@ export default function WorkerStats() {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Desempenho dos Funcionários</h2>
-        <span className="text-sm text-gray-500">{workers.length} funcionários ativos</span>
+        <h2 className="text-2xl font-bold text-gray-900">Desempeño de los Empleados</h2>
+        <span className="text-sm text-gray-500">{workers.length} empleados activos</span>
       </div>
 
       {workers.length === 0 ? (
         <div className="text-center py-12">
           <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500">Nenhum funcionário cadastrado</p>
+          <p className="text-gray-500">Ningún empleado registrado</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -133,7 +133,7 @@ export default function WorkerStats() {
                     </span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    {worker.rating > 0 ? `Avaliação: ${worker.rating.toFixed(1)}` : 'Sem avaliação'}
+                    {worker.rating > 0 ? `Calificación: ${worker.rating.toFixed(1)}` : 'Sin calificación'}
                   </p>
                 </div>
               </div>
@@ -144,11 +144,11 @@ export default function WorkerStats() {
                   <p className="text-2xl font-bold text-gray-900">{worker.totalTasks}</p>
                 </div>
                 <div className="bg-green-100 rounded-lg p-3 text-center">
-                  <p className="text-sm text-green-700 font-semibold">Aprovadas</p>
+                  <p className="text-sm text-green-700 font-semibold">Aprobadas</p>
                   <p className="text-2xl font-bold text-green-700">{worker.approvedTasks}</p>
                 </div>
                 <div className="bg-red-100 rounded-lg p-3 text-center">
-                  <p className="text-sm text-red-700 font-semibold">Recusadas</p>
+                  <p className="text-sm text-red-700 font-semibold">Rechazadas</p>
                   <p className="text-2xl font-bold text-red-700">{worker.rejectedTasks}</p>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function WorkerStats() {
               {worker.totalTasks > 0 && (
                 <div className="mb-3">
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-600">Taxa de Aprovação</span>
+                    <span className="text-gray-600">Tasa de Aprobación</span>
                     <span className="font-bold text-gray-900">
                       {((worker.approvedTasks / worker.totalTasks) * 100).toFixed(0)}%
                     </span>
@@ -172,7 +172,7 @@ export default function WorkerStats() {
 
               {worker.recentTasks.length > 0 && (
                 <div className="pt-3 border-t border-gray-200">
-                  <p className="text-xs font-semibold text-gray-700 mb-2">Tarefas Recentes:</p>
+                  <p className="text-xs font-semibold text-gray-700 mb-2">Tareas Recientes:</p>
                   <div className="space-y-1">
                     {worker.recentTasks.slice(0, 2).map((task) => (
                       <div key={task.id} className="flex items-center gap-2 text-xs">
