@@ -76,10 +76,10 @@ export default function ProjectList() {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      planning: 'Planejamento',
-      in_progress: 'Em Andamento',
+      planning: 'Planificación',
+      in_progress: 'En Curso',
       paused: 'Pausada',
-      completed: 'Concluída',
+      completed: 'Completada',
     };
     return labels[status as keyof typeof labels] || status;
   };
@@ -102,14 +102,14 @@ export default function ProjectList() {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Obras Ativas</h2>
-        <span className="text-sm text-gray-500">{projects.length} em andamento</span>
+        <h2 className="text-xl font-bold text-gray-900">Obras Activas</h2>
+        <span className="text-sm text-gray-500">{projects.length} en curso</span>
       </div>
 
       {projects.length === 0 ? (
         <div className="text-center py-12">
           <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500">Nenhuma obra ativa no momento</p>
+          <p className="text-gray-500">Ninguna obra activa en este momento</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -129,7 +129,7 @@ export default function ProjectList() {
                       {isOverBudget && (
                         <span className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3" />
-                          Acima do orçamento
+                          Por encima del presupuesto
                         </span>
                       )}
                     </div>
@@ -149,7 +149,7 @@ export default function ProjectList() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <TrendingUp className="w-4 h-4 text-blue-600" />
-                      <span className="text-xs text-gray-600">Progresso</span>
+                      <span className="text-xs text-gray-600">Progreso</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -167,17 +167,17 @@ export default function ProjectList() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <Users className="w-4 h-4 text-green-600" />
-                      <span className="text-xs text-gray-600">Trabalhando</span>
+                      <span className="text-xs text-gray-600">Trabajando</span>
                     </div>
                     <p className="text-sm font-bold text-gray-900">
-                      {project.active_workers} {project.active_workers === 1 ? 'pessoa' : 'pessoas'}
+                      {project.active_workers} {project.active_workers === 1 ? 'persona' : 'personas'}
                     </p>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <Building2 className="w-4 h-4 text-purple-600" />
-                      <span className="text-xs text-gray-600">Orçamento</span>
+                      <span className="text-xs text-gray-600">Presupuesto</span>
                     </div>
                     <p className={`text-sm font-bold ${isOverBudget ? 'text-red-600' : 'text-gray-900'}`}>
                       {budgetPercent.toFixed(0)}% usado
@@ -188,11 +188,11 @@ export default function ProjectList() {
                 <div className="pt-3 border-t border-gray-100">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">
-                      €{Number(project.spent).toLocaleString()} / €{Number(project.budget).toLocaleString()}
+                      €{Number(project.spent).toLocaleString('es-ES')} / €{Number(project.budget).toLocaleString('es-ES')}
                     </span>
                     {project.expected_end_date && (
                       <span className="text-gray-500">
-                        Prazo: {new Date(project.expected_end_date).toLocaleDateString('pt-BR')}
+                        Plazo: {new Date(project.expected_end_date).toLocaleDateString('es-ES')}
                       </span>
                     )}
                   </div>
