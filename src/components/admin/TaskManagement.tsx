@@ -54,7 +54,7 @@ export default function TaskManagement() {
       setWorkers(workersRes.data || []);
     } catch (error) {
       console.error('Error loading data:', error);
-      alert('Erro ao carregar dados');
+      alert('Error al cargar los datos');
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export default function TaskManagement() {
     e.preventDefault();
 
     if (!formData.title || !formData.project_id) {
-      alert('Preencha todos os campos obrigatórios');
+      alert('Complete todos los campos obligatorios');
       return;
     }
 
@@ -85,7 +85,7 @@ export default function TaskManagement() {
           .eq('id', editingTask.id);
 
         if (error) throw error;
-        alert('Tarefa atualizada com sucesso!');
+        alert('¡Tarea actualizada con éxito!');
       } else {
         const { error } = await supabase.from('tasks').insert({
           title: formData.title,
@@ -103,20 +103,20 @@ export default function TaskManagement() {
         if (formData.assigned_to) {
           await supabase.from('notifications').insert({
             user_id: formData.assigned_to,
-            title: 'Nova Tarefa Atribuída',
-            message: `Você recebeu uma nova tarefa: ${formData.title}`,
+            title: 'Nueva Tarea Asignada',
+            message: `Ha recibido una nueva tarea: ${formData.title}`,
             type: 'info',
           });
         }
 
-        alert('Tarefa criada com sucesso!');
+        alert('¡Tarea creada con éxito!');
       }
 
       resetForm();
       loadData();
     } catch (error: any) {
       console.error('Error saving task:', error);
-      alert('Erro ao salvar tarefa: ' + error.message);
+      alert('Error al guardar la tarea: ' + error.message);
     }
   };
 
@@ -136,16 +136,16 @@ export default function TaskManagement() {
   };
 
   const handleDelete = async (taskId: string) => {
-    if (!confirm('Tem certeza que deseja deletar esta tarefa?')) return;
+    if (!confirm('¿Está seguro de que desea eliminar esta tarea?')) return;
 
     try {
       const { error } = await supabase.from('tasks').delete().eq('id', taskId);
       if (error) throw error;
-      alert('Tarefa deletada com sucesso!');
+      alert('¡Tarea eliminada con éxito!');
       loadData();
     } catch (error) {
       console.error('Error deleting task:', error);
-      alert('Erro ao deletar tarefa');
+      alert('Error al eliminar la tarea');
     }
   };
 
@@ -177,11 +177,11 @@ export default function TaskManagement() {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      pending: 'Pendente',
-      in_progress: 'Em Andamento',
-      review: 'Em Revisão',
-      approved: 'Aprovada',
-      rejected: 'Recusada',
+      pending: 'Pendiente',
+      in_progress: 'En Curso',
+      review: 'En Revisión',
+      approved: 'Aprobada',
+      rejected: 'Rechazada',
     };
     return labels[status as keyof typeof labels] || status;
   };
@@ -198,8 +198,8 @@ export default function TaskManagement() {
 
   const getPriorityLabel = (priority: string) => {
     const labels = {
-      low: 'Baixa',
-      medium: 'Média',
+      low: 'Baja',
+      medium: 'Media',
       high: 'Alta',
       urgent: 'Urgente',
     };
@@ -207,22 +207,22 @@ export default function TaskManagement() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Carregando...</div>;
+    return <div className="text-center py-8">Cargando...</div>;
   }
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Tarefas</h2>
-          <p className="text-gray-600 mt-1">Crie e gerencie tarefas das obras</p>
+          <h2 className="text-2xl font-bold text-gray-900">Gestión de Tareas</h2>
+          <p className="text-gray-600 mt-1">Cree y gestione tareas de las obras</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Nova Tarefa
+          Nueva Tarea
         </button>
       </div>
 
@@ -230,7 +230,7 @@ export default function TaskManagement() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">
-              {editingTask ? 'Editar Tarefa' : 'Criar Nova Tarefa'}
+              {editingTask ? 'Editar Tarea' : 'Crear Nueva Tarea'}
             </h3>
             <button
               onClick={resetForm}
@@ -244,47 +244,47 @@ export default function TaskManagement() {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Título da Tarefa *
+                  Título de la Tarea *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Ex: Instalar portas do 2º andar"
+                  placeholder="Ej: Instalar puertas del 2º piso"
                   required
                 />
               </div>
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição Geral
+                  Descripción General
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={3}
-                  placeholder="Descrição geral da tarefa..."
+                  placeholder="Descripción general de la tarea..."
                 />
               </div>
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Especificações e Medidas Exatas (opcional)
+                  Especificaciones y Medidas Exactas (opcional)
                 </label>
                 <textarea
                   value={formData.specifications}
                   onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
                   className="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50"
                   rows={4}
-                  placeholder="Exemplo:
-• Parede: 3 metros de largura x 2.5 metros de altura
-• Cor: Branco gelo (Suvinil código 10001)
-• Material: Tinta PVA premium
-• Acabamento: Sem imperfeições, liso perfeito"
+                  placeholder="Ejemplo:
+• Pared: 3 metros de ancho x 2.5 metros de alto
+• Color: Blanco hielo (Suvinil código 10001)
+• Material: Pintura PVA premium
+• Acabado: Sin imperfecciones, liso perfecto"
                 />
-                <p className="text-xs text-blue-600 mt-1">💡 Use este campo quando precisar de medidas exatas e acabamentos específicos</p>
+                <p className="text-xs text-blue-600 mt-1">💡 Use este campo cuando necesite medidas exactas y acabados específicos</p>
               </div>
 
               <div>
@@ -297,7 +297,7 @@ export default function TaskManagement() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 >
-                  <option value="">Selecione a obra</option>
+                  <option value="">Seleccione la obra</option>
                   {projects.map((project) => (
                     <option key={project.id} value={project.id}>
                       {project.name}
@@ -308,14 +308,14 @@ export default function TaskManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Atribuir a Funcionário
+                  Asignar a Empleado
                 </label>
                 <select
                   value={formData.assigned_to}
                   onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="">Não atribuído</option>
+                  <option value="">No asignado</option>
                   {workers.map((worker) => (
                     <option key={worker.id} value={worker.id}>
                       {worker.full_name}
@@ -326,15 +326,15 @@ export default function TaskManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Prioridade
+                  Prioridad
                 </label>
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="low">Baixa</option>
-                  <option value="medium">Média</option>
+                  <option value="low">Baja</option>
+                  <option value="medium">Media</option>
                   <option value="high">Alta</option>
                   <option value="urgent">Urgente</option>
                 </select>
@@ -342,7 +342,7 @@ export default function TaskManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Prazo
+                  Plazo
                 </label>
                 <input
                   type="date"
@@ -355,18 +355,18 @@ export default function TaskManagement() {
               {editingTask && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
+                    Estado
                   </label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="pending">Pendente</option>
-                    <option value="in_progress">Em Andamento</option>
-                    <option value="review">Em Revisão</option>
-                    <option value="approved">Aprovada</option>
-                    <option value="rejected">Recusada</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="in_progress">En Curso</option>
+                    <option value="review">En Revisión</option>
+                    <option value="approved">Aprobada</option>
+                    <option value="rejected">Rechazada</option>
                   </select>
                 </div>
               )}
@@ -377,7 +377,7 @@ export default function TaskManagement() {
                 type="submit"
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium"
               >
-                {editingTask ? 'Atualizar Tarefa' : 'Criar Tarefa'}
+                {editingTask ? 'Actualizar Tarea' : 'Crear Tarea'}
               </button>
               <button
                 type="button"
@@ -396,20 +396,20 @@ export default function TaskManagement() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tarefa</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Tarea</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Obra</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Funcionário</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Prioridade</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Prazo</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Ações</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Empleado</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Estado</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Prioridad</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Plazo</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {tasks.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                    Nenhuma tarefa cadastrada
+                    Ninguna tarea registrada
                   </td>
                 </tr>
               ) : (
@@ -422,13 +422,13 @@ export default function TaskManagement() {
                           <p className="text-sm text-gray-600 line-clamp-1">{task.description}</p>
                         )}
                         {(task as any).specifications && (
-                          <p className="text-xs text-blue-600 mt-1">✓ Com especificações</p>
+                          <p className="text-xs text-blue-600 mt-1">✓ Con especificaciones</p>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm">{task.project.name}</td>
                     <td className="px-6 py-4 text-sm">
-                      {task.worker ? task.worker.full_name : <span className="text-gray-400">Não atribuído</span>}
+                      {task.worker ? task.worker.full_name : <span className="text-gray-400">No asignado</span>}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(task.status)}`}>
@@ -441,7 +441,7 @@ export default function TaskManagement() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      {task.due_date ? new Date(task.due_date).toLocaleDateString('pt-BR') : '-'}
+                      {task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES') : '-'}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -455,7 +455,7 @@ export default function TaskManagement() {
                         <button
                           onClick={() => handleDelete(task.id)}
                           className="text-red-600 hover:text-red-700 p-1"
-                          title="Deletar"
+                          title="Eliminar"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
