@@ -20,8 +20,8 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Painel Administrativo</h1>
-          <p className="text-gray-600 mt-1">Gerencie usuários, obras e tarefas</p>
+          <h1 className="text-3xl font-bold text-gray-900">Panel Administrativo</h1>
+          <p className="text-gray-600 mt-1">Gestione usuarios, obras y tareas</p>
         </div>
       </div>
 
@@ -34,7 +34,7 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Usuários
+          Usuarios
         </button>
         <button
           onClick={() => setActiveTab('projects')}
@@ -54,7 +54,7 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Tarefas
+          Tareas
         </button>
         <button
           onClick={() => setActiveTab('stats')}
@@ -64,7 +64,7 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Desempenho
+          Desempeño
         </button>
       </div>
 
