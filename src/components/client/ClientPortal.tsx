@@ -93,7 +93,7 @@ export default function ClientPortal() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando suas obras...</p>
+          <p className="text-gray-600">Cargando sus obras...</p>
         </div>
       </div>
     );
@@ -104,18 +104,18 @@ export default function ClientPortal() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Suas Obras
+            Sus Obras
           </h1>
           <p className="text-gray-600">
-            Acompanhe o progresso em tempo real das suas construções
+            Siga el progreso en tiempo real de sus construcciones
           </p>
         </div>
 
         {projects.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
             <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-lg text-gray-600 mb-2">Nenhuma obra cadastrada</p>
-            <p className="text-sm text-gray-500">Entre em contato com o administrador para associar obras à sua conta</p>
+            <p className="text-lg text-gray-600 mb-2">Ninguna obra registrada</p>
+            <p className="text-sm text-gray-500">Póngase en contacto con el administrador para asociar obras a su cuenta</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -146,7 +146,7 @@ export default function ClientPortal() {
                     <div className="space-y-3">
                       <div>
                         <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-gray-600 font-medium">Progresso</span>
+                          <span className="text-gray-600 font-medium">Progreso</span>
                           <span className="font-bold text-blue-600">{project.progress_percentage}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -160,7 +160,7 @@ export default function ClientPortal() {
                       <div className="flex items-center justify-between text-sm pt-2">
                         <div className="flex items-center gap-1.5 text-gray-600">
                           <Users className="w-4 h-4" />
-                          <span>{project.active_workers} trabalhando</span>
+                          <span>{project.active_workers} trabajando</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-gray-600">
                           <ImageIcon className="w-4 h-4" />
@@ -173,8 +173,8 @@ export default function ClientPortal() {
                           daysRemaining < 0 ? 'text-red-600' : daysRemaining < 7 ? 'text-orange-600' : 'text-gray-600'
                         }`}>
                           {daysRemaining < 0
-                            ? `Atrasado ${Math.abs(daysRemaining)} dias`
-                            : `${daysRemaining} dias restantes`
+                            ? `Atrasado ${Math.abs(daysRemaining)} días`
+                            : `${daysRemaining} días restantes`
                           }
                         </div>
                       )}
@@ -190,7 +190,7 @@ export default function ClientPortal() {
               ) : (
                 <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
                   <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">Selecione uma obra para ver os detalhes</p>
+                  <p className="text-gray-500 text-lg">Seleccione una obra para ver los detalles</p>
                 </div>
               )}
             </div>
@@ -230,7 +230,7 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            Visão Geral
+            Visión General
           </button>
           <button
             onClick={() => setActiveTab('photos')}
@@ -250,7 +250,7 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            Tarefas ({completedTasks}/{totalTasks})
+            Tareas ({completedTasks}/{totalTasks})
           </button>
         </div>
       </div>
@@ -259,12 +259,11 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="bg-blue-500 p-2 rounded-lg">
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-blue-900">Progresso Geral</span>
+                  <span className="text-sm font-medium text-blue-900">Progreso General</span>
                 </div>
                 <p className="text-4xl font-bold text-blue-900">{project.progress_percentage}%</p>
                 <div className="mt-3 w-full bg-blue-200 rounded-full h-2">
@@ -280,11 +279,11 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                   <div className="bg-green-500 p-2 rounded-lg">
                     <Users className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-900">Trabalhando Agora</span>
+                  <span className="text-sm font-medium text-green-900">Trabajando Ahora</span>
                 </div>
                 <p className="text-4xl font-bold text-green-900">{project.active_workers}</p>
                 <p className="text-sm text-green-700 mt-2">
-                  {project.active_workers > 0 ? 'Equipe ativa na obra' : 'Ninguém trabalhando no momento'}
+                  {project.active_workers > 0 ? 'Equipo activo en la obra' : 'Nadie trabajando en este momento'}
                 </p>
               </div>
 
@@ -293,16 +292,16 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                   <div className="bg-purple-500 p-2 rounded-lg">
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-purple-900">Prazo</span>
+                  <span className="text-sm font-medium text-purple-900">Plazo</span>
                 </div>
                 <p className="text-xl font-bold text-purple-900">
                   {project.expected_end_date
-                    ? new Date(project.expected_end_date).toLocaleDateString('pt-BR')
-                    : 'Não definido'}
+                    ? new Date(project.expected_end_date).toLocaleDateString('es-ES')
+                    : 'No definido'}
                 </p>
                 {project.start_date && (
                   <p className="text-sm text-purple-700 mt-2">
-                    Início: {new Date(project.start_date).toLocaleDateString('pt-BR')}
+                    Inicio: {new Date(project.start_date).toLocaleDateString('es-ES')}
                   </p>
                 )}
               </div>
@@ -312,12 +311,12 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                   <div className="bg-orange-500 p-2 rounded-lg">
                     <Clock className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-orange-900">Tarefas</span>
+                  <span className="text-sm font-medium text-orange-900">Tareas</span>
                 </div>
                 <p className="text-4xl font-bold text-orange-900">
                   {completedTasks}/{totalTasks}
                 </p>
-                <p className="text-sm text-orange-700 mt-2">Tarefas concluídas</p>
+                <p className="text-sm text-orange-700 mt-2">Tareas completadas</p>
               </div>
             </div>
 
@@ -325,34 +324,34 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
                   <DollarSign className="w-5 h-5" />
-                  Orçamento e Gastos
+                  Presupuesto y Gastos
                 </h3>
                 {isOverBudget && (
                   <span className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" />
-                    Acima do Orçamento
+                    Por encima del presupuesto
                   </span>
                 )}
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Orçamento Total</span>
+                  <span className="text-gray-600">Presupuesto Total</span>
                   <span className="text-xl font-bold text-gray-900">
-                    €{Number(project.budget || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    €{Number(project.budget || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Gasto Atual</span>
+                  <span className="text-gray-600">Gasto Actual</span>
                   <span className={`text-xl font-bold ${isOverBudget ? 'text-red-600' : 'text-blue-600'}`}>
-                    €{Number(project.spent || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    €{Number(project.spent || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Utilização do Orçamento</span>
+                    <span className="text-sm text-gray-600">Utilización del Presupuesto</span>
                     <span className={`text-sm font-bold ${
                       budgetPercent > 100 ? 'text-red-600' : budgetPercent > 80 ? 'text-orange-600' : 'text-green-600'
                     }`}>
@@ -377,7 +376,7 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                       {remaining >= 0 ? 'Saldo Restante' : 'Valor Excedido'}
                     </span>
                     <span className={`text-xl font-bold ${remaining >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                      €{Math.abs(remaining).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      €{Math.abs(remaining).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -391,8 +390,8 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
             {project.photos.length === 0 ? (
               <div className="text-center py-12">
                 <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg mb-2">Nenhuma foto disponível ainda</p>
-                <p className="text-sm text-gray-400">As fotos aparecerão aqui conforme o trabalho avança</p>
+                <p className="text-gray-500 text-lg mb-2">Ninguna foto disponible todavía</p>
+                <p className="text-sm text-gray-400">Las fotos aparecerán aquí a medida que el trabajo avance</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
@@ -400,7 +399,7 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                   <div key={photo.id} className="aspect-video bg-gray-100 rounded-xl overflow-hidden group relative shadow-sm hover:shadow-md transition">
                     <img
                       src={photo.photo_url}
-                      alt={photo.description || 'Foto do projeto'}
+                      alt={photo.description || 'Foto del proyecto'}
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     />
                     {photo.description && (
@@ -411,7 +410,7 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                       </div>
                     )}
                     <div className="absolute top-2 right-2 bg-white rounded-lg px-3 py-1 text-xs font-medium text-gray-700 shadow">
-                      {new Date(photo.created_at).toLocaleDateString('pt-BR')}
+                      {new Date(photo.created_at).toLocaleDateString('es-ES')}
                     </div>
                   </div>
                 ))}
@@ -425,8 +424,8 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
             {project.tasks.length === 0 ? (
               <div className="text-center py-12">
                 <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg mb-2">Nenhuma tarefa cadastrada</p>
-                <p className="text-sm text-gray-400">As tarefas aparecerão aqui quando forem criadas</p>
+                <p className="text-gray-500 text-lg mb-2">Ninguna tarea registrada</p>
+                <p className="text-sm text-gray-400">Las tareas aparecerán aquí cuando sean creadas</p>
               </div>
             ) : (
               project.tasks.map((task) => (
@@ -439,7 +438,7 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                       )}
                       {task.quality_score !== null && task.status === 'approved' && (
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm text-gray-600">Qualidade:</span>
+                          <span className="text-sm text-gray-600">Calidad:</span>
                           <div className="flex items-center gap-1">
                             {Array.from({ length: 10 }).map((_, i) => (
                               <div
@@ -467,11 +466,11 @@ function ProjectDetails({ project }: { project: ProjectWithDetails }) {
                           : 'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {task.status === 'approved' && '✓ Concluída'}
-                      {task.status === 'in_progress' && '⏳ Em Andamento'}
-                      {task.status === 'review' && '👀 Em Revisão'}
-                      {task.status === 'pending' && '⏸ Pendente'}
-                      {task.status === 'rejected' && '✗ Recusada'}
+                      {task.status === 'approved' && '✓ Completada'}
+                      {task.status === 'in_progress' && '⏳ En Progreso'}
+                      {task.status === 'review' && '👀 En Revisión'}
+                      {task.status === 'pending' && '⏸ Pendiente'}
+                      {task.status === 'rejected' && '✗ Rechazada'}
                     </span>
                   </div>
                 </div>
