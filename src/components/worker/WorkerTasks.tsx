@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Task, Project, Photo } from '../../types/database';
-import { Clock, CheckCircle, AlertCircle, Camera, X, AlertTriangle } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, Camera, X, AlertTriangle, Trash2 } from 'lucide-react';
 
 interface TaskWithProject extends Task {
   project: Project;
@@ -21,6 +21,9 @@ export default function WorkerTasks() {
     const subscription = supabase
       .channel('worker_tasks_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+        loadTasks();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'photos' }, () => {
         loadTasks();
       })
       .subscribe();
@@ -52,13 +55,21 @@ export default function WorkerTasks() {
             const { data: photos } = await supabase
               .from('photos')
               .select('*')
-              .eq('task_id', task.id);
+              .eq('task_id', task.id)
+              .order('created_at', { ascending: false });
 
             return { ...task, photos: photos || [] };
           })
         );
 
         setTasks(tasksWithPhotos);
+
+        if (selectedTask) {
+          const updatedTask = tasksWithPhotos.find(t => t.id === selectedTask.id);
+          if (updatedTask) {
+            setSelectedTask(updatedTask);
+          }
+        }
       }
     } catch (error) {
       console.error('Error loading tasks:', error);
@@ -222,34 +233,63 @@ function TaskDetailModal({
 }) {
   const { profile } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
 
-  const handlePhotoUpload = async (file: File) => {
-    if (!profile) return;
+  const handlePhotoSelect = (files: FileList | null) => {
+    if (!files) return;
+    const newFiles = Array.from(files);
+    setPhotoFiles(prev => [...prev, ...newFiles]);
+  };
+
+  const removePhotoFile = (index: number) => {
+    setPhotoFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!profile || photoFiles.length === 0) return;
 
     setUploading(true);
     try {
-      const photoUrl = `https://images.pexels.com/photos/1268558/pexels-photo-1268558.jpeg?auto=compress&cs=tinysrgb&w=800`;
+      for (const file of photoFiles) {
+        const photoUrl = URL.createObjectURL(file);
 
-      const { error: photoError } = await supabase
-        .from('photos')
-        .insert({
-          project_id: task.project_id,
-          task_id: task.id,
-          uploaded_by: profile.id,
-          photo_url: photoUrl,
-          photo_type: 'progress',
-          description: `Foto de la tarea: ${task.title}`,
-        });
+        const { error: photoError } = await supabase
+          .from('photos')
+          .insert({
+            project_id: task.project_id,
+            task_id: task.id,
+            uploaded_by: profile.id,
+            photo_url: photoUrl,
+            photo_type: 'progress',
+            description: `Foto de la tarea: ${task.title}`,
+          });
 
-      if (photoError) throw photoError;
+        if (photoError) throw photoError;
+      }
 
+      setPhotoFiles([]);
       onUpdate();
-      alert('✓ ¡Foto enviada con éxito!');
+      alert('✓ ¡Fotos enviadas con éxito!');
     } catch (error) {
-      console.error('Error uploading photo:', error);
-      alert('Error al subir la foto');
+      console.error('Error uploading photos:', error);
+      alert('Error al subir las fotos');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeletePhoto = async (photoId: string) => {
+    try {
+      const { error } = await supabase
+        .from('photos')
+        .delete()
+        .eq('id', photoId);
+
+      if (error) throw error;
+      onUpdate();
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+      alert('Error al eliminar la foto');
     }
   };
 
@@ -376,43 +416,81 @@ function TaskDetailModal({
                   📸 Añade fotos del trabajo realizado:
                 </p>
 
-                <label className="block cursor-pointer">
+                <label className="block cursor-pointer mb-3">
                   <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
                     <Camera className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                     <p className="text-sm text-blue-700 font-medium">
-                      {uploading ? 'Enviando foto...' : 'Haz clic para añadir foto'}
+                      Haz clic para seleccionar fotos
                     </p>
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       className="hidden"
-                      disabled={uploading}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handlePhotoUpload(file);
-                      }}
+                      onChange={(e) => handlePhotoSelect(e.target.files)}
                     />
                   </div>
                 </label>
+
+                {photoFiles.length > 0 && (
+                  <div>
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {photoFiles.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Foto ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removePhotoFile(index)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={handlePhotoUpload}
+                      disabled={uploading}
+                      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-bold disabled:opacity-50"
+                    >
+                      {uploading ? 'Enviando...' : `Enviar ${photoFiles.length} foto(s)`}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
             {task.photos.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {task.photos.map((photo) => (
-                  <div key={photo.id} className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative group">
-                    <img
-                      src={photo.photo_url}
-                      alt={photo.description || 'Foto de la tarea'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
-                      <p className="text-white text-xs">
-                        {new Date(photo.created_at).toLocaleDateString('es-ES')}
-                      </p>
+              <div>
+                <p className="text-sm text-green-700 font-medium mb-3">Fotos enviadas:</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {task.photos.map((photo) => (
+                    <div key={photo.id} className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative group">
+                      <img
+                        src={photo.photo_url}
+                        alt={photo.description || 'Foto de la tarea'}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
+                        <p className="text-white text-xs">
+                          {new Date(photo.created_at).toLocaleDateString('es-ES')}
+                        </p>
+                      </div>
+                      {task.status !== 'review' && task.status !== 'approved' && (
+                        <button
+                          onClick={() => handleDeletePhoto(photo.id)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="text-center py-8 bg-gray-50 rounded-lg">
