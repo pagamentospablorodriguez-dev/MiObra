@@ -102,7 +102,7 @@ export default function ClientPortal() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="text-gray-600 font-medium">Carregando seu portal...</p>
+          <p className="text-gray-600 font-medium">Cargando su portal...</p>
         </div>
       </div>
     );
@@ -116,13 +116,13 @@ export default function ClientPortal() {
             <div className="bg-blue-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Building2 className="w-10 h-10 text-blue-600" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Bem-vindo ao seu Portal</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Bienvenido a su Portal</h2>
             <p className="text-gray-600 text-lg mb-8">
-              Ainda não existem obras vinculadas ao seu perfil. Assim que uma obra for iniciada, você poderá acompanhar todo o progresso por aqui.
+              Aún no hay obras vinculadas a su perfil. Tan pronto como se inicie una obra, podrá seguir todo el progreso por aquí.
             </p>
             <div className="inline-flex items-center gap-2 text-blue-600 font-medium">
               <Activity className="w-5 h-5" />
-              Monitoramento em tempo real
+              Monitoreo en tiempo real
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function ClientPortal() {
               <div className="bg-white p-2 rounded-lg shadow-sm group-hover:bg-blue-50 transition-colors">
                 <ArrowLeft className="w-4 h-4" />
               </div>
-              Voltar para minhas obras
+              Volver a mis obras
             </button>
 
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -154,18 +154,20 @@ export default function ClientPortal() {
                     <div>
                       <div className="flex items-center gap-3 mb-2">
                         <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider">
-                          {selectedProject.status.replace('_', ' ')}
+                          {selectedProject.status === 'in_progress' ? 'En progreso' : 
+                           selectedProject.status === 'completed' ? 'Completado' : 
+                           selectedProject.status.replace('_', ' ')}
                         </span>
                         <span className="flex items-center gap-1 text-sm opacity-90">
                           <Calendar className="w-4 h-4" />
-                          Início: {selectedProject.start_date ? new Date(selectedProject.start_date).toLocaleDateString() : 'A definir'}
+                          Inicio: {selectedProject.start_date ? new Date(selectedProject.start_date).toLocaleDateString('es-ES') : 'A definir'}
                         </span>
                       </div>
                       <h1 className="text-4xl font-bold">{selectedProject.name}</h1>
                     </div>
                     <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 min-w-[280px]">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium opacity-90">Progresso da Obra</span>
+                        <span className="text-sm font-medium opacity-90">Progreso de la Obra</span>
                         <span className="text-2xl font-bold">{selectedProject.progress_percentage}%</span>
                       </div>
                       <div className="h-3 bg-white/20 rounded-full overflow-hidden">
@@ -185,7 +187,7 @@ export default function ClientPortal() {
                     <div className="p-2 bg-blue-50 rounded-lg">
                       <MapPin className="w-5 h-5 text-blue-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-500">Localização</span>
+                    <span className="text-sm font-medium text-gray-500">Ubicación</span>
                   </div>
                   <p className="text-gray-900 font-semibold leading-tight">{selectedProject.address}</p>
                 </div>
@@ -194,37 +196,37 @@ export default function ClientPortal() {
                     <div className="p-2 bg-green-50 rounded-lg">
                       <DollarSign className="w-5 h-5 text-green-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-500">Orçamento Total</span>
+                    <span className="text-sm font-medium text-gray-500">Presupuesto Total</span>
                   </div>
-                  <p className="text-gray-900 text-2xl font-bold">€{Number(selectedProject.budget || 0).toLocaleString()}</p>
+                  <p className="text-gray-900 text-2xl font-bold">€{Number(selectedProject.budget || 0).toLocaleString('es-ES')}</p>
                 </div>
                 <div className="p-8 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-purple-50 rounded-lg">
                       <TrendingUp className="w-5 h-5 text-purple-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-500">Valor Investido</span>
+                    <span className="text-sm font-medium text-gray-500">Valor Invertido</span>
                   </div>
-                  <p className="text-purple-600 text-2xl font-bold">€{Number(selectedProject.spent || 0).toLocaleString()}</p>
+                  <p className="text-purple-600 text-2xl font-bold">€{Number(selectedProject.spent || 0).toLocaleString('es-ES')}</p>
                 </div>
                 <div className="p-8 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-orange-50 rounded-lg">
                       <Users className="w-5 h-5 text-orange-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-500">Equipe no Local</span>
+                    <span className="text-sm font-medium text-gray-500">Equipo en el Lugar</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <p className="text-gray-900 text-2xl font-bold">{selectedProject.active_workers}</p>
-                    <span className="text-sm text-gray-500 font-medium">profissionais ativos</span>
+                    <span className="text-sm text-gray-500 font-medium">profesionales activos</span>
                   </div>
                 </div>
               </div>
 
               <div className="p-8 bg-gray-50/50">
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Descrição do Projeto</h3>
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Descripción del Proyecto</h3>
                 <p className="text-gray-700 text-lg leading-relaxed max-w-4xl">
-                  {selectedProject.description || 'Nenhuma descrição detalhada disponível para este projeto.'}
+                  {selectedProject.description || 'No hay una descripción detallada disponible para este proyecto.'}
                 </p>
               </div>
             </div>
@@ -234,11 +236,11 @@ export default function ClientPortal() {
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Cronograma de Atividades</h3>
-                      <p className="text-gray-500">Acompanhe o status de cada etapa da sua obra</p>
+                      <h3 className="text-2xl font-bold text-gray-900">Cronograma de Actividades</h3>
+                      <p className="text-gray-500">Siga el estado de cada etapa de su obra</p>
                     </div>
                     <div className="bg-blue-50 px-4 py-2 rounded-xl text-blue-700 font-semibold text-sm">
-                      {selectedProject.tasks.length} Tarefas Totais
+                      {selectedProject.tasks.length} Tareas Totales
                     </div>
                   </div>
 
@@ -246,7 +248,7 @@ export default function ClientPortal() {
                     {selectedProject.tasks.length === 0 ? (
                       <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
                         <Timer className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500 font-medium">Aguardando início das tarefas.</p>
+                        <p className="text-gray-500 font-medium">Esperando el inicio de las tareas.</p>
                       </div>
                     ) : (
                       selectedProject.tasks.map((task) => (
@@ -265,7 +267,7 @@ export default function ClientPortal() {
                               <div className="flex items-center gap-3 mt-1">
                                 <span className="text-sm text-gray-500 flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
-                                  Prazo: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'A definir'}
+                                  Plazo: {task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES') : 'A definir'}
                                 </span>
                                 {task.quality_score && (
                                   <span className="text-sm text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-md">
@@ -282,7 +284,11 @@ export default function ClientPortal() {
                               task.status === 'review' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-blue-100 text-blue-700'
                             }`}>
-                              {task.status.replace('_', ' ')}
+                              {task.status === 'in_progress' ? 'En progreso' : 
+                               task.status === 'approved' ? 'Aprobado' : 
+                               task.status === 'rejected' ? 'Rechazado' : 
+                               task.status === 'review' ? 'En revisión' : 
+                               task.status.replace('_', ' ')}
                             </span>
                             <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-400 transition-colors" />
                           </div>
@@ -296,14 +302,14 @@ export default function ClientPortal() {
               <div className="space-y-8">
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                   <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900">Galeria</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">Galería</h3>
                     <button className="text-blue-600 font-bold text-sm hover:underline">Ver todas</button>
                   </div>
 
                   {selectedProject.photos.length === 0 ? (
                     <div className="text-center py-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
                       <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 font-medium">Nenhuma foto disponível.</p>
+                      <p className="text-gray-500 font-medium">No hay fotos disponibles.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
@@ -311,15 +317,15 @@ export default function ClientPortal() {
                         <div key={photo.id} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
                           <img 
                             src={photo.photo_url} 
-                            alt={photo.description || 'Foto da obra'} 
+                            alt={photo.description || 'Foto de la obra'} 
                             className="w-full h-full object-cover transition duration-500 group-hover:scale-110"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                             <p className="text-white font-medium text-sm mb-1">
-                              {photo.description || 'Registro de progresso'}
+                              {photo.description || 'Registro de progreso'}
                             </p>
                             <p className="text-white/70 text-xs">
-                              {new Date(photo.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
+                              {new Date(photo.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
                             </p>
                           </div>
                         </div>
@@ -329,12 +335,12 @@ export default function ClientPortal() {
                 </div>
 
                 <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl shadow-lg p-8 text-white">
-                  <h3 className="text-xl font-bold mb-4">Precisa de ajuda?</h3>
+                  <h3 className="text-xl font-bold mb-4">¿Necesita ayuda?</h3>
                   <p className="opacity-90 mb-6 leading-relaxed">
-                    Entre em contato direto com o mestre de obras ou com o suporte administrativo para qualquer dúvida sobre o seu projeto.
+                    Póngase en contacto directo con el maestro de obras o con el soporte administrativo para cualquier duda sobre su proyecto.
                   </p>
                   <button className="w-full bg-white text-blue-600 font-bold py-4 rounded-2xl hover:bg-blue-50 transition-colors shadow-lg shadow-blue-900/20">
-                    Falar com Suporte
+                    Hablar con Soporte
                   </button>
                 </div>
               </div>
@@ -344,8 +350,8 @@ export default function ClientPortal() {
           <div className="animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
               <div>
-                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Minhas Obras</h1>
-                <p className="text-gray-500 text-lg">Gerencie e acompanhe o progresso de todos os seus investimentos.</p>
+                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Mis Obras</h1>
+                <p className="text-gray-500 text-lg">Gestione y siga el progreso de todas sus inversiones.</p>
               </div>
               <div className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
                 <div className="px-6 py-3 bg-blue-50 rounded-xl">
@@ -371,7 +377,9 @@ export default function ClientPortal() {
                         project.status === 'in_progress' ? 'bg-blue-500/80 text-white' :
                         'bg-gray-500/80 text-white'
                       }`}>
-                        {project.status.replace('_', ' ')}
+                        {project.status === 'in_progress' ? 'En progreso' : 
+                         project.status === 'completed' ? 'Completado' : 
+                         project.status.replace('_', ' ')}
                       </span>
                     </div>
                     <div className="absolute bottom-6 left-6 right-6">
@@ -403,14 +411,14 @@ export default function ClientPortal() {
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
                       <div className="p-4 bg-gray-50 rounded-2xl">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Equipe</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Equipo</span>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-blue-600" />
                           <span className="font-bold text-gray-900">{project.active_workers}</span>
                         </div>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-2xl">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tarefas</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tareas</span>
                         <div className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           <span className="font-bold text-gray-900">{project.tasks.length}</span>
@@ -420,7 +428,7 @@ export default function ClientPortal() {
 
                     <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                       <span className="text-blue-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
-                        Ver Detalhes da Obra
+                        Ver Detalles de la Obra
                         <ArrowRight className="w-5 h-5" />
                       </span>
                     </div>
