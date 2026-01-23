@@ -87,6 +87,12 @@ export default function IssuesList() {
     return labels[severity as keyof typeof labels] || severity;
   };
 
+  const handleResolveClick = (issue: IssueWithDetails) => {
+    if (confirm('¿Estás seguro de que este problema está resuelto?\n\nEsta acción marcará el problema como completamente resuelto.')) {
+      handleResolve(issue.id);
+    }
+  };
+
   const handleResolve = async (issueId: string) => {
     try {
       const { error } = await supabase
@@ -216,7 +222,7 @@ export default function IssuesList() {
 
                 <div className="flex items-center gap-2 mt-3">
                   <button
-                    onClick={() => handleResolve(issue.id)}
+                    onClick={() => handleResolveClick(issue)}
                     className="flex-1 bg-green-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-green-700 transition"
                   >
                     Marcar como Resuelto
@@ -238,7 +244,7 @@ export default function IssuesList() {
         <IssueDetailModal
           issue={selectedIssue}
           onClose={() => setSelectedIssue(null)}
-          onResolve={handleResolve}
+          onResolve={handleResolveClick}
         />
       )}
     </>
@@ -252,7 +258,7 @@ function IssueDetailModal({
 }: {
   issue: IssueWithDetails;
   onClose: () => void;
-  onResolve: (id: string) => void;
+  onResolve: (issue: IssueWithDetails) => void;
 }) {
   const getSeverityColor = (severity: string) => {
     const colors = {
@@ -342,7 +348,7 @@ function IssueDetailModal({
           {issue.status !== 'resolved' && (
             <div className="flex gap-3 pt-4 border-t">
               <button
-                onClick={() => onResolve(issue.id)}
+                onClick={() => onResolve(issue)}
                 className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-bold"
               >
                 Marcar como Resuelto
