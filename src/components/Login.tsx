@@ -122,49 +122,22 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="mt-8">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500 font-medium">Acceso de Demostración</span>
-                </div>
-              </div>
 
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => quickLogin('admin')}
-                  className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center"
-                >
-                  <div className="text-2xl mb-1">👔</div>
-                  <div className="text-xs font-semibold text-gray-700">Admin</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickLogin('worker')}
-                  className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center"
-                >
-                  <div className="text-2xl mb-1">👷</div>
-                  <div className="text-xs font-semibold text-gray-700">Empleado</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickLogin('client')}
-                  className="p-3 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center"
-                >
-                  <div className="text-2xl mb-1">👤</div>
-                  <div className="text-xs font-semibold text-gray-700">Cliente</div>
-                </button>
-              </div>
 
-              <p className="text-xs text-gray-500 text-center mt-4">
-                Haz clic en un perfil para rellenar automáticamente
-              </p>
-            </div>
+
+
+
+
+
+        
+          
+          
+          
           </div>
         </div>
+
+
+        
 
         <div className="mt-6 text-center">
           <p className="text-white text-sm opacity-90">
