@@ -79,9 +79,22 @@ export default function ReportIssue({ onClose, projectId }: ReportIssueProps) {
 
       if (photoFiles.length > 0) {
         setUploadingPhotos(true);
-        for (const file of photoFiles) {
-          const placeholderUrl = `https://images.pexels.com/photos/1109541/pexels-photo-1109541.jpeg?auto=compress&cs=tinysrgb&w=800`;
-          photoUrls.push(placeholderUrl);
+        for (let i = 0; i < photoFiles.length; i++) {
+          const file = photoFiles[i];
+          const timestamp = Date.now();
+          const fileName = `issue-${formData.project_id}-${timestamp}-${i}.${file.name.split('.').pop()}`;
+
+          const { error: uploadError, data } = await supabase.storage
+            .from('photos')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrlData } = supabase.storage
+            .from('photos')
+            .getPublicUrl(fileName);
+
+          photoUrls.push(publicUrlData.publicUrl);
         }
         setUploadingPhotos(false);
       }
