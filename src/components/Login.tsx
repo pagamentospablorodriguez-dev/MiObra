@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import Footer from './Footer';
+import { useAuth } from '../contexts/AuthContext';
+import { Building2, Eye, EyeOff } from 'lucide-react';
 
-interface LoginProps {
-  onLogin: (email: string, password: string) => Promise<void>;
-}
-
-export default function Login({ onLogin }: LoginProps) {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,150 +16,152 @@ export default function Login({ onLogin }: LoginProps) {
     setLoading(true);
 
     try {
-      await onLogin(email, password);
+      await signIn(email, password);
     } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login. Tente novamente.');
+      setError('Email o contraseña incorrectos. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
   };
 
+  const quickLogin = (role: 'admin' | 'worker' | 'client') => {
+    const credentials = {
+      admin: { email: 'admin@alaobra.com', password: 'admin123' },
+      worker: { email: 'worker@alaobra.com', password: 'worker123' },
+      client: { email: 'client@alaobra.com', password: 'client123' },
+    };
+
+    setEmail(credentials[role].email);
+    setPassword(credentials[role].password);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          {/* Logo and Title */}
-          <div className="text-center mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 flex items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-10 text-white text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-2xl">AO</span>
+              <div className="bg-white bg-opacity-20 backdrop-blur-lg p-4 rounded-2xl">
+                <Building2 className="w-12 h-12" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">AlaObra</h1>
-            <p className="text-slate-600">Gestão inteligente de obras</p>
+            <h1 className="text-3xl font-bold mb-2">AlaObra</h1>
+            <p className="text-blue-100">Gestión Profesional de Obras</p>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
-            {/* Error Message */}
+          <div className="p-8">
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-                <AlertCircle className="text-red-600 flex-shrink-0" size={20} />
-                <p className="text-red-700 text-sm">{error}</p>
+              <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                <p className="text-red-700 text-sm font-medium text-center">{error}</p>
               </div>
             )}
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email Input */}
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                   Email
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 text-slate-400" size={20} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                    required
-                  />
-                </div>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  placeholder="tu@email.com"
+                  required
+                />
               </div>
 
-              {/* Password Input */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Senha
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Contraseña
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 text-slate-400" size={20} />
                   <input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12"
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
                   >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-slate-300" />
-                  <span className="text-slate-600">Lembrar-me</span>
-                </label>
-                <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                  Esqueceu a senha?
-                </a>
-              </div>
-
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-slate-400 disabled:to-slate-400 text-white font-semibold py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
                 {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     Entrando...
-                  </>
+                  </span>
                 ) : (
                   'Entrar'
                 )}
               </button>
             </form>
 
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-slate-500">ou</span>
-              </div>
-            </div>
 
-            {/* Demo Credentials */}
-            <div className="bg-blue-50 rounded-lg p-4 text-sm">
-              <p className="text-slate-700 font-medium mb-2">Credenciais de Teste:</p>
-              <p className="text-slate-600">
-                <strong>Admin:</strong> admin@alaobra.com / senha123
-              </p>
-              <p className="text-slate-600">
-                <strong>Funcionário:</strong> worker@alaobra.com / senha123
-              </p>
-              <p className="text-slate-600">
-                <strong>Cliente:</strong> client@alaobra.com / senha123
-              </p>
-            </div>
+
+
+
+
+
+
+        
+          
+          
+          
           </div>
+        </div>
 
-          {/* Footer Text */}
-          <p className="text-center text-slate-600 text-sm mt-6">
-            Não tem uma conta?{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-              Solicite acesso
-            </a>
+
+        
+
+        <div className="mt-6 text-center">
+          <p className="text-white text-sm opacity-90">
+            Sistema completo de gestión y control de obras
           </p>
         </div>
       </div>
 
-      {/* Footer */}
-      <Footer />
+      <style>{`
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 }
