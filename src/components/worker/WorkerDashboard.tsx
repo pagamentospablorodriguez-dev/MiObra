@@ -1,405 +1,219 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
-import { CheckIn, Project } from '../../types/database';
-import { Clock, LogOut, LogIn, AlertTriangle, CheckCircle, ListTodo } from 'lucide-react';
-import WorkerTasks from './WorkerTasks';
-import ReportIssue from './ReportIssue';
+import { useState, useEffect } from 'react';
+import { Clock, CheckCircle, AlertCircle, MapPin, Camera } from 'lucide-react';
+import Footer from '../Footer';
 
 export default function WorkerDashboard() {
-  const { profile } = useAuth();
-  const [activeCheckIn, setActiveCheckIn] = useState<CheckIn | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showReportIssue, setShowReportIssue] = useState(false);
+  const [checkedIn, setCheckedIn] = useState(false);
   const [workingTime, setWorkingTime] = useState('0h 0m');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadActiveCheckIn();
-  }, [profile]);
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
-    if (activeCheckIn) {
-      const interval = setInterval(() => {
-        setWorkingTime(getWorkingHours());
-      }, 60000);
+    if (!checkedIn) return;
 
-      return () => clearInterval(interval);
-    }
-  }, [activeCheckIn]);
+    const interval = setInterval(() => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      setWorkingTime(`${hours}h ${minutes}m`);
+    }, 60000);
 
-  const loadActiveCheckIn = async () => {
-    if (!profile) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('check_ins')
-        .select('*')
-        .eq('worker_id', profile.id)
-        .is('check_out_time', null)
-        .maybeSingle();
-
-      if (error) throw error;
-      setActiveCheckIn(data);
-      if (data) {
-        setWorkingTime(getWorkingHours(data));
-      }
-    } catch (error) {
-      console.error('Error loading check-in:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCheckIn = async (projectId: string) => {
-    if (!profile) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('check_ins')
-        .insert({
-          worker_id: profile.id,
-          project_id: projectId,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      setActiveCheckIn(data);
-    } catch (error) {
-      console.error('Error checking in:', error);
-      alert('Error al registrar entrada. Inténtalo de nuevo.');
-    }
-  };
-
-  const handleCheckOut = async (notes?: string) => {
-    if (!activeCheckIn) return;
-
-    if (!confirm('¿Estás seguro de que deseas finalizar tu jornada?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('check_ins')
-        .update({
-          check_out_time: new Date().toISOString(),
-          notes: notes,
-        })
-        .eq('id', activeCheckIn.id);
-
-      if (error) throw error;
-      setActiveCheckIn(null);
-      alert('¡Jornada finalizada! ¡Hasta mañana!');
-    } catch (error) {
-      console.error('Error checking out:', error);
-      alert('Error al registrar salida. Inténtalo de nuevo.');
-    }
-  };
-
-  const getWorkingHours = (checkIn = activeCheckIn) => {
-    if (!checkIn) return '0h 0m';
-    const start = new Date(checkIn.check_in_time);
-    const now = new Date();
-    const diff = now.getTime() - start.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
+    return () => clearInterval(interval);
+  }, [checkedIn]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="text-slate-600">Carregando seu dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            ¡Hola, {profile?.full_name}!
-          </h1>
-          <p className="text-lg text-gray-600">
-            {activeCheckIn ? '👷 Estás trabajando' : '📱 Registra tu entrada para comenzar tu día'}
-          </p>
-        </div>
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">
+              Bem-vindo, João Silva!
+            </h1>
+            <p className="text-slate-600">
+              {checkedIn ? '✅ Você está trabalhando' : '📱 Registre sua entrada para começar'}
+            </p>
+          </div>
 
-        {!activeCheckIn ? (
-          <CheckInSection onCheckIn={handleCheckIn} />
-        ) : (
-          <>
-            <ActiveWorkSection
-              workingTime={workingTime}
-              onCheckOut={handleCheckOut}
-              onReportIssue={() => setShowReportIssue(true)}
-            />
-            <WorkerTasks />
-          </>
-        )}
-      </div>
+          {/* Check-in Section */}
+          {!checkedIn ? (
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-8 h-8 text-blue-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Registre sua Entrada</h2>
+                <p className="text-slate-600">Clique abaixo para começar seu dia de trabalho</p>
+              </div>
 
-      {showReportIssue && (
-        <ReportIssue onClose={() => setShowReportIssue(false)} projectId={activeCheckIn?.project_id} />
-      )}
-    </div>
-  );
-}
-
-function CheckInSection({ onCheckIn }: { onCheckIn: (projectId: string) => void }) {
-  const { profile } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadProjects();
-  }, [profile]);
-
-  const loadProjects = async () => {
-    if (!profile) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select(`
-          project_id,
-          projects!inner (
-            id,
-            name,
-            address,
-            status
-          )
-        `)
-        .eq('assigned_to', profile.id)
-        .eq('projects.status', 'in_progress');
-
-      if (error) throw error;
-
-      const uniqueProjects = Array.from(
-        new Map(data?.map(item => [item.projects.id, item.projects])).values()
-      ) as Project[];
-
-      setProjects(uniqueProjects);
-    } catch (error) {
-      console.error('Error loading projects:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-lg p-8">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="bg-blue-100 p-4 rounded-2xl">
-          <LogIn className="w-8 h-8 text-blue-600" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Comenzar Trabajo</h2>
-          <p className="text-gray-600 mt-1">Selecciona la obra donde trabajarás hoy</p>
-        </div>
-      </div>
-
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
-        <h3 className="font-semibold text-blue-900 mb-3">📋 Instrucciones:</h3>
-        <ol className="space-y-2 text-blue-800">
-          <li className="flex gap-2">
-            <span className="font-bold">1.</span>
-            <span>Cuando llegues a la obra, selecciona en cuál estás</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-bold">2.</span>
-            <span>Haz clic en el botón verde "Iniciar Trabajo"</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-bold">3.</span>
-            <span>El sistema empezará a contar tus horas automáticamente</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-bold">4.</span>
-            <span>Cuando termines el día, haz clic en "Finalizar Trabajo"</span>
-          </li>
-        </ol>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-500 mt-2">Cargando obras...</p>
-        </div>
-      ) : projects.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-xl">
-          <p className="text-gray-600">No tienes obras asignadas en este momento.</p>
-          <p className="text-sm text-gray-500 mt-1">Contacta con tu supervisor.</p>
-        </div>
-      ) : (
-        <>
-          <div className="mb-6">
-            <label className="block text-lg font-semibold text-gray-900 mb-3">
-              Selecciona la Obra:
-            </label>
-            <div className="space-y-3">
-              {projects.map((project) => (
-                <button
-                  key={project.id}
-                  onClick={() => setSelectedProject(project.id)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition ${
-                    selectedProject === project.id
-                      ? 'border-blue-500 bg-blue-50 shadow-md'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedProject === project.id
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {selectedProject === project.id && (
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">{project.name}</p>
-                      <p className="text-sm text-gray-600">{project.address}</p>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 bg-slate-50 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-1">Obra Selecionada</p>
+                  <p className="font-bold text-slate-900">Obra Centro - Fundações</p>
+                </div>
+                <div className="p-4 bg-slate-50 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-1">Localização</p>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-blue-600" />
+                    <p className="font-bold text-slate-900">Detectando...</p>
                   </div>
-                </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setCheckedIn(true)}
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg transition duration-200 text-lg"
+              >
+                ✓ Registrar Entrada
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Active Work Section */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-sm border border-green-200 p-8 mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <p className="text-sm text-green-700 font-medium mb-1">Tempo Trabalhado</p>
+                    <p className="text-4xl font-bold text-green-900">{workingTime}</p>
+                  </div>
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="p-4 bg-white rounded-lg border border-green-100">
+                    <p className="text-xs text-slate-600 mb-1">Entrada</p>
+                    <p className="font-bold text-slate-900">08:00</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-lg border border-green-100">
+                    <p className="text-xs text-slate-600 mb-1">Obra</p>
+                    <p className="font-bold text-slate-900">Fundações</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button className="flex-1 bg-white text-slate-900 font-bold py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                    Reportar Problema
+                  </button>
+                  <button
+                    onClick={() => setCheckedIn(false)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition"
+                  >
+                    Registrar Saída
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Tasks Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Minhas Tarefas</h2>
+
+            <div className="space-y-4">
+              {[
+                { title: 'Preparar fundações', status: 'in_progress', priority: 'high' },
+                { title: 'Escavar área', status: 'completed', priority: 'high' },
+                { title: 'Compactar solo', status: 'pending', priority: 'medium' },
+              ].map((task, i) => (
+                <div
+                  key={i}
+                  className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 ${
+                          task.status === 'completed'
+                            ? 'bg-green-500 border-green-500'
+                            : task.status === 'in_progress'
+                            ? 'bg-blue-500 border-blue-500'
+                            : 'border-slate-300'
+                        }`}
+                      ></div>
+                      <div>
+                        <p className="font-bold text-slate-900">{task.title}</p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {task.status === 'completed'
+                            ? '✓ Concluída'
+                            : task.status === 'in_progress'
+                            ? '🔄 Em progresso'
+                            : '⏳ Pendente'}
+                        </p>
+                      </div>
+                    </div>
+                       <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        task.priority === 'high'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-yellow-100 text-yellow-700'
+                      }`}
+                    >
+                      {task.priority === 'high' ? 'Alta' : 'Média'}
+                    </span>
+                  </div>
+
+                  {task.status === 'in_progress' && (
+                    <button className="w-full mt-3 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 font-medium py-2 rounded-lg hover:bg-blue-100 transition">
+                      <Camera size={16} />
+                      Enviar Foto
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           </div>
 
-          <button
-            onClick={() => selectedProject && onCheckIn(selectedProject)}
-            disabled={!selectedProject}
-            className="w-full bg-green-600 text-white py-5 rounded-xl font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-3"
-          >
-            <LogIn className="w-6 h-6" />
-            {selectedProject ? 'Iniciar Trabajo' : 'Selecciona una obra primero'}
-          </button>
-        </>
-      )}
+          {/* Notifications */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Notificações</h2>
+
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex gap-3">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                </div>
+                <div>
+                  <p className="font-medium text-blue-900">Tarefa aprovada</p>
+                  <p className="text-sm text-blue-700">Sua tarefa "Escavar área" foi aprovada com nota 9/10</p>
+                  <p className="text-xs text-blue-600 mt-1">Há 2 horas</p>
+                </div>
+              </div>
+
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex gap-3">
+                <div className="flex-shrink-0">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                </div>
+                <div>
+                  <p className="font-medium text-yellow-900">Tarefa aguardando aprovação</p>
+                  <p className="text-sm text-yellow-700">Sua tarefa "Compactar solo" está aguardando revisão</p>
+                  <p className="text-xs text-yellow-600 mt-1">Há 1 hora</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
-  );
-}
-
-function ActiveWorkSection({
-  workingTime,
-  onCheckOut,
-  onReportIssue,
-}: {
-  workingTime: string;
-  onCheckOut: (notes?: string) => void;
-  onReportIssue: () => void;
-}) {
-  const [showCheckOutModal, setShowCheckOutModal] = useState(false);
-  const [notes, setNotes] = useState('');
-
-  const handleCheckOut = () => {
-    onCheckOut(notes);
-    setShowCheckOutModal(false);
-  };
-
-  return (
-    <>
-      <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl shadow-lg p-8 text-white mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="bg-white bg-opacity-20 p-4 rounded-2xl">
-              <Clock className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-green-100 text-sm font-medium">Tiempo Trabajado Hoy</p>
-              <p className="text-4xl font-bold">{workingTime}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowCheckOutModal(true)}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-xl font-semibold transition flex items-center gap-2 backdrop-blur"
-          >
-            <LogOut className="w-5 h-5" />
-            Finalizar Trabajo
-          </button>
-        </div>
-
-        <div className="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur">
-          <p className="text-sm text-green-100 mb-2">✅ Estás trabajando</p>
-          <p className="text-xs text-green-100">
-            El sistema está registrando tus horas automáticamente. Cuando termines, haz clic en "Finalizar Trabajo".
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <button
-          onClick={onReportIssue}
-          className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition text-left"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-red-100 p-3 rounded-lg">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
-            </div>
-            <span className="font-semibold text-gray-900">Reportar Problema</span>
-          </div>
-          <p className="text-sm text-gray-600">
-            ¿Encontraste algún problema en la obra? Repórtalo aquí.
-          </p>
-        </button>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <ListTodo className="w-6 h-6 text-blue-600" />
-            </div>
-            <span className="font-semibold text-gray-900">Mis Tareas</span>
-          </div>
-          <p className="text-sm text-gray-600">
-            Consulta tus tareas abajo y envía fotos al completarlas.
-          </p>
-        </div>
-      </div>
-
-      {showCheckOutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Finalizar Trabajo</h3>
-
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-              <p className="text-green-800 font-medium mb-2">Tiempo trabajado: {workingTime}</p>
-              <p className="text-sm text-green-700">
-                Tus horas se guardarán automáticamente.
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Observaciones del día (opcional)
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={4}
-                placeholder="¿Qué hiciste hoy? Ej: Instalé 5 puertas, preparé las paredes para pintar..."
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleCheckOut}
-                className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition"
-              >
-                Confirmar
-              </button>
-              <button
-                onClick={() => setShowCheckOutModal(false)}
-                className="bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-300 transition"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 }
