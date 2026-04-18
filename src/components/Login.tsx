@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Building2, Eye, EyeOff } from 'lucide-react';
+import { Building2, Eye, EyeOff, Shield, Zap, HeartHandshake } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -8,6 +9,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
   const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,26 +29,31 @@ export default function Login() {
     }
   };
 
-  const quickLogin = (role: 'admin' | 'worker' | 'client') => {
-    const credentials = {
-      admin: { email: 'admin@alaobra.com', password: 'admin123' },
-      worker: { email: 'worker@alaobra.com', password: 'worker123' },
-      client: { email: 'client@alaobra.com', password: 'client123' },
-    };
-
-    setEmail(credentials[role].email);
-    setPassword(credentials[role].password);
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: window.location.origin,
+      });
+      if (error) throw error;
+      setForgotSent(true);
+    } catch (err: any) {
+      setError('Error al enviar el correo. Verifica el email.');
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 flex items-center justify-center p-4">
-      <div className="absolute inset-0 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 flex flex-col items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full max-w-md relative z-10 flex-1 flex flex-col justify-center">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-10 text-white text-center">
             <div className="flex justify-center mb-4">
@@ -62,82 +72,128 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="tu@email.com"
-                  required
-                />
-              </div>
+            {!showForgot ? (
+              <>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      placeholder="tu@email.com"
+                      required
+                    />
+                  </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12"
-                    placeholder="••••••••"
-                    required
-                  />
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Contraseña
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgot(true); setError(''); }}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium transition"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Entrando...
+                      </span>
                     ) : (
-                      <Eye className="w-5 h-5" />
+                      'Entrar'
                     )}
                   </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Entrando...
-                  </span>
+                </form>
+              </>
+            ) : (
+              <div>
+                {!forgotSent ? (
+                  <form onSubmit={handleForgotPassword} className="space-y-5">
+                    <div className="text-center mb-2">
+                      <h2 className="text-xl font-bold text-gray-900 mb-1">Recuperar Contraseña</h2>
+                      <p className="text-sm text-gray-500">Te enviaremos un enlace para crear una nueva contraseña.</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                      <input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        placeholder="tu@email.com"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50 shadow-lg"
+                    >
+                      {forgotLoading ? 'Enviando...' : 'Enviar Enlace'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgot(false); setError(''); }}
+                      className="w-full text-gray-500 hover:text-gray-700 text-sm font-medium transition py-2"
+                    >
+                      ← Volver al login
+                    </button>
+                  </form>
                 ) : (
-                  'Entrar'
+                  <div className="text-center space-y-4">
+                    <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
+                      <div className="text-4xl mb-3">✓</div>
+                      <h3 className="font-bold text-green-800 mb-1">¡Correo enviado!</h3>
+                      <p className="text-sm text-green-700">Revisa tu bandeja de entrada y sigue el enlace para cambiar tu contraseña.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(''); setError(''); }}
+                      className="w-full text-blue-600 hover:text-blue-700 text-sm font-semibold transition py-2"
+                    >
+                      ← Volver al login
+                    </button>
+                  </div>
                 )}
-              </button>
-            </form>
-
-
-
-
-
-
-
-
-        
-          
-          
-          
+              </div>
+            )}
           </div>
         </div>
-
-
-        
 
         <div className="mt-6 text-center">
           <p className="text-white text-sm opacity-90">
@@ -146,21 +202,35 @@ export default function Login() {
         </div>
       </div>
 
+      <footer className="relative z-10 w-full max-w-md mt-8">
+        <div className="flex items-center justify-center gap-6 mb-4">
+          <div className="flex items-center gap-2 text-white/70 text-xs">
+            <Shield className="w-3.5 h-3.5" />
+            Datos seguros
+          </div>
+          <div className="flex items-center gap-2 text-white/70 text-xs">
+            <Zap className="w-3.5 h-3.5" />
+            Tiempo real
+          </div>
+          <div className="flex items-center gap-2 text-white/70 text-xs">
+            <HeartHandshake className="w-3.5 h-3.5" />
+            Soporte activo
+          </div>
+        </div>
+        <p className="text-center text-white/50 text-xs">
+          © {new Date().getFullYear()} AlaObra · Todos los derechos reservados
+        </p>
+      </footer>
+
       <style>{`
         @keyframes blob {
           0%, 100% { transform: translate(0, 0) scale(1); }
           33% { transform: translate(30px, -50px) scale(1.1); }
           66% { transform: translate(-20px, 20px) scale(0.9); }
         }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
       `}</style>
     </div>
   );
