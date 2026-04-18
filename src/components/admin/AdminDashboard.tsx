@@ -36,26 +36,27 @@ export default function AdminDashboard() {
 
   const loadDashboardData = async () => {
     try {
+      const today = new Date().toISOString().split('T')[0];
+
       const [
         projectsRes,
         workersRes,
         checkInsRes,
         issuesRes,
         tasksRes,
+        todayTasksRes,
       ] = await Promise.all([
         supabase.from('projects').select('*').in('status', ['in_progress', 'planning']),
         supabase.from('profiles').select('*').eq('role', 'worker').eq('is_active', true),
         supabase.from('check_ins').select('*').is('check_out_time', null),
         supabase.from('issues').select('*').eq('status', 'open'),
         supabase.from('tasks').select('*').eq('status', 'review'),
+        supabase
+          .from('tasks')
+          .select('*')
+          .eq('status', 'approved')
+          .gte('completed_at', today),
       ]);
-
-      const today = new Date().toISOString().split('T')[0];
-      const { data: todayTasks } = await supabase
-        .from('tasks')
-        .select('*')
-        .gte('completed_at', today)
-        .eq('status', 'approved');
 
       setStats({
         activeProjects: projectsRes.data?.length || 0,
@@ -63,7 +64,7 @@ export default function AdminDashboard() {
         activeCheckIns: checkInsRes.data?.length || 0,
         openIssues: issuesRes.data?.length || 0,
         pendingTasks: tasksRes.data?.length || 0,
-        todayProgress: todayTasks?.data?.length || 0,
+        todayProgress: todayTasksRes.data?.length || 0,
       });
     } catch (error) {
       console.error('Error loading dashboard:', error);
